@@ -46,6 +46,32 @@ export default defineConfig([
       parserOptions: {
         parser: tseslint.parser,
       },
+      globals: {
+        // Nuxt auto-imports
+        useHead: 'readonly',
+        useRoute: 'readonly',
+        useRouter: 'readonly',
+        useNuxtApp: 'readonly',
+        useState: 'readonly',
+        useFetch: 'readonly',
+        useAsyncData: 'readonly',
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        HTMLElement: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+      },
+    },
+    rules: {
+      // Allow single-word component names for pages (index, login, etc.)
+      'vue/multi-word-component-names': ['error', {
+        ignores: ['index', 'login', 'register', 'space', 'default', 'error', 'materials', 'templates'],
+      }],
+      'no-undef': 'off',
     },
   },
   globalIgnores([

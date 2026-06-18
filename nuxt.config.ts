@@ -14,41 +14,44 @@ export default defineNuxtConfig({
   },
   telemetry: false,
 
-  // App head configuration
+  // App head configuration - SEO optimized
   app: {
     head: {
-      title: '新应用 | 扣子编程',
-      titleTemplate: '%s | 扣子编程',
+      title: '易设计 - 电商人都在用的智能设计平台',
+      titleTemplate: '%s | 易设计',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         {
           name: 'description',
           content:
-            '扣子编程是一款一站式云端 Vibe Coding 开发平台。通过对话轻松构建智能体、工作流和网站，实现从创意到上线的无缝衔接。',
+            '易设计是专业的电商设计平台，提供海报设计、商品套图生成、AI换背景、图片翻译等智能工具，让电商设计更高效、更专业。',
         },
         {
           name: 'keywords',
           content:
-            '扣子编程,Coze Code,Vibe Coding,AI 编程,智能体搭建,工作流搭建,网站搭建,网站部署,全栈开发,AI 工程师',
+            '易设计,电商设计,海报设计,商品套图,AI换背景,图片翻译,跨境电商,详情页设计,智能设计工具',
         },
-        { name: 'author', content: 'Coze Code Team' },
-        { name: 'generator', content: 'Coze Code' },
-        // Open Graph
-        { property: 'og:title', content: '扣子编程 | 你的 AI 工程师已就位' },
+        { name: 'author', content: '易设计团队' },
+        { name: 'generator', content: 'Nuxt 3' },
+        // Open Graph for social sharing
+        { property: 'og:title', content: '易设计 - 电商人都在用的智能设计平台' },
         {
           property: 'og:description',
           content:
-            '我正在使用扣子编程 Vibe Coding，让创意瞬间上线。告别拖拽，拥抱心流。',
+            '易设计提供AI智能设计工具，一键生成商品套图、海报设计、详情页，助力电商营销。',
         },
-        { property: 'og:url', content: 'https://code.coze.cn' },
-        { property: 'og:site_name', content: '扣子编程' },
-        { property: 'og:locale', content: 'zh_CN' },
         { property: 'og:type', content: 'website' },
-        // Robots
+        { property: 'og:locale', content: 'zh_CN' },
+        // Twitter Card
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: '易设计 - 电商人都在用的智能设计平台' },
+        { name: 'twitter:description', content: '易设计提供AI智能设计工具，一键生成商品套图、海报设计' },
+        // Robots for SEO
         { name: 'robots', content: 'index, follow' },
+        // Canonical URL hint (update with actual domain)
+        { name: 'googlebot', content: 'index, follow' },
       ],
-      link: [{ rel: 'canonical', href: 'https://code.coze.cn' }],
       htmlAttrs: {
         lang: 'zh-CN',
       },
