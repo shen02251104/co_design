@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 设计服务接口 - 模板与素材管理
  */
-public interface DesignService {
+public interface TemplateService {
     
     /**
      * 获取模板列表
