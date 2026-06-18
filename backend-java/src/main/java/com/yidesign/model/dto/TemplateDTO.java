@@ -1,5 +1,6 @@
 package com.yidesign.model.dto;
 
+import com.yidesign.model.entity.DesignTemplate;
 import lombok.Data;
 import java.util.List;
 
@@ -21,9 +22,17 @@ public class TemplateDTO {
     private Long createTime;        // 创建时间
     private Long updateTime;        // 更新时间
     
+    // 单个模板详情
+    private DesignTemplate template;
+    
     // 列表返回时使用
-    private List<TemplateDTO> list;
-    private Integer total;
+    private List<DesignTemplate> list;
+    private Long total;
     private Integer page;
     private Integer size;
+    
+    // 兼容字段
+    private String title;       // 标题（兼容name）
+    private String thumb;       // 缩略图（兼容thumbnail）
+    private String content;     // 内容（兼容data）
 }

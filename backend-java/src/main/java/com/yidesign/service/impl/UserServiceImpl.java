@@ -88,8 +88,8 @@ public class UserServiceImpl implements UserService {
         
         user.setVipLevel(0);
         user.setStatus(1);
-        user.setCreateTime(LocalDateTime.now());
-        user.setUpdateTime(LocalDateTime.now());
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
         
         userMapper.insert(user);
         
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updateUser(User user) {
-        user.setUpdateTime(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
         return userMapper.updateById(user) > 0;
     }
 
