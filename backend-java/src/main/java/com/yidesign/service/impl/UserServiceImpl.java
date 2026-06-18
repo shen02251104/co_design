@@ -23,6 +23,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Override
     public UserVO login(LoginDTO loginDTO) {
@@ -48,7 +51,7 @@ public class UserServiceImpl implements UserService {
         }
         
         // 生成token
-        String token = JwtUtil.generateToken(user.getId());
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
         
         UserVO vo = new UserVO();
         vo.setId(user.getId());
@@ -91,7 +94,7 @@ public class UserServiceImpl implements UserService {
         userMapper.insert(user);
         
         // 生成token
-        String token = JwtUtil.generateToken(user.getId());
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
         
         UserVO vo = new UserVO();
         vo.setId(user.getId());

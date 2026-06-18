@@ -13,6 +13,11 @@ public class RegisterDTO {
     private String username;
     
     /**
+     * 昵称
+     */
+    private String nickname;
+    
+    /**
      * 邮箱
      */
     private String email;

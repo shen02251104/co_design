@@ -26,4 +26,14 @@ public class LoginDTO {
      * 验证码（短信/邮箱验证码登录时使用）
      */
     private String code;
+    
+    /**
+     * 手机号登录
+     */
+    private String phone;
+    
+    /**
+     * 邮箱登录
+     */
+    private String email;
 }
