@@ -4,6 +4,7 @@ import com.yidesign.model.dto.LoginDTO;
 import com.yidesign.model.dto.RegisterDTO;
 import com.yidesign.model.vo.UserVO;
 import com.yidesign.service.UserService;
+import com.yidesign.utils.JwtUtil;
 import com.yidesign.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -60,18 +60,18 @@ public class TemplateServiceImpl implements TemplateService {
         }
         // 从DTO中提取数据设置到entity
         if (template.getTitle() != null) {
-            entity.setTitle(template.getTitle());
+            entity.setName(template.getTitle());
         }
         if (template.getCategory() != null) {
-            entity.setCategory(template.getCategory());
+            entity.setCategoryId(Long.parseLong(template.getCategory()));
         }
         if (template.getThumb() != null) {
-            entity.setThumb(template.getThumb());
+            entity.setPreviewUrl(template.getThumb());
         }
         if (template.getContent() != null) {
-            entity.setContent(template.getContent());
+            entity.setTemplateData(template.getContent());
         }
-        entity.setStatus(1);
+        entity.setIsPublic(1);
         
         templateMapper.insert(entity);
         return entity.getId().toString();

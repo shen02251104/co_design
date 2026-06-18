@@ -1,6 +1,5 @@
 package com.yidesign.service;
 
-import com.yidesign.model.dto.UploadResultDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -9,12 +8,27 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FileService {
     
     /**
-     * 上传图片
+     * 上传文件
      */
-    UploadResultDTO uploadImage(MultipartFile file, String userId) throws Exception;
+    String uploadFile(MultipartFile file) throws Exception;
     
     /**
-     * 获取用户上传的图片列表
+     * 上传文件（指定分类）
      */
-    Object getUserImages(String userId);
+    String uploadFile(MultipartFile file, String category) throws Exception;
+    
+    /**
+     * 删除文件
+     */
+    boolean deleteFile(String filePath);
+    
+    /**
+     * 获取文件字节
+     */
+    byte[] getFileBytes(String filePath) throws Exception;
+    
+    /**
+     * 获取文件URL
+     */
+    String getFileUrl(String filePath);
 }
