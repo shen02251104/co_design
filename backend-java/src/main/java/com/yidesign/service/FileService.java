@@ -31,4 +31,9 @@ public interface FileService {
      * 获取文件URL
      */
     String getFileUrl(String filePath);
+    
+    /**
+     * 获取用户上传的图片列表
+     */
+    Object getUserImages(String userId);
 }

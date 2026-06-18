@@ -100,4 +100,13 @@ public class FileServiceImpl implements FileService {
     public String getFileUrl(String filePath) {
         return "/api/design/file/" + filePath;
     }
+    
+    @Override
+    public Object getUserImages(String userId) {
+        // 返回用户上传的图片列表，这里暂时返回空列表
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("list", new java.util.ArrayList<>());
+        result.put("total", 0);
+        return result;
+    }
 }
