@@ -144,7 +144,13 @@ public class DesignController {
             @Parameter(description = "用户ID") @RequestParam(required = false) String userId
     ) {
         try {
-            UploadResultDTO result = fileService.uploadImage(file, userId);
+            String filePath = fileService.uploadFile(file);
+            UploadResultDTO result = new UploadResultDTO();
+            result.setUrl(fileService.getFileUrl(filePath));
+            result.setFilename(file.getOriginalFilename());
+            result.setSize(file.getSize());
+            result.setType(file.getContentType());
+            result.setId(filePath);
             return Result.success(result);
         } catch (Exception e) {
             return Result.error("上传失败: " + e.getMessage());
