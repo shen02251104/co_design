@@ -19,6 +19,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     /**
      * 用户登录
@@ -56,7 +59,7 @@ public class UserController {
                 return Result.error("未登录");
             }
             
-            Long userId = JwtUtil.getUserIdFromToken(token.replace("Bearer ", ""));
+            Long userId = jwtUtil.getUserId(token.replace("Bearer ", ""));
             if (userId == null) {
                 return Result.error("token无效");
             }
