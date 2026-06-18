@@ -2,6 +2,7 @@ package com.yidesign.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * JWT 工具类
+ * JWT 工具类（兼容 JJWT 0.11.5）
  */
 @Component
 public class JwtUtil {
@@ -30,11 +31,11 @@ public class JwtUtil {
         claims.put("username", username);
         
         return Jwts.builder()
-                .claims(claims)
-                .subject(username)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(SECRET_KEY)
+                .setClaims(claims)
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -43,11 +44,11 @@ public class JwtUtil {
      */
     public Claims parseToken(String token) {
         try {
-            return Jwts.parser()
-                    .verifyWith(SECRET_KEY)
+            return Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
                     .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+                    .parseClaimsJws(token)
+                    .getBody();
         } catch (Exception e) {
             return null;
         }
@@ -79,14 +80,6 @@ public class JwtUtil {
      * 验证 Token 是否有效
      */
     public boolean validateToken(String token) {
-        Claims claims = parseToken(token);
-        return claims != null && !isTokenExpired(claims);
-    }
-
-    /**
-     * 判断 Token 是否过期
-     */
-    private boolean isTokenExpired(Claims claims) {
-        return claims.getExpiration().before(new Date());
+        return parseToken(token) != null;
     }
 }
