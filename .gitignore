@@ -89,3 +89,17 @@ logs/
 
 # Preview files
 .preview
+# Nuxt dev/build outputs
+.output
+.data
+.nitro
+node-compile-cache
+# Node dependencies
+logs
+\*.log
+# Misc
+.fleet
+.idea
+# Local env files
+.env.\*
+!.env.example
