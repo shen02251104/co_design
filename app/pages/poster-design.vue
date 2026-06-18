@@ -1,5 +1,16 @@
 <template>
   <NuxtLayout>
+    <!-- 顶部设计器入口 -->
+    <div class="mb-4 bg-gradient-to-r from-purple-600 to-pink-500 rounded-xl p-4 flex items-center justify-between">
+      <div class="text-white">
+        <h2 class="font-bold text-lg">专业海报设计器</h2>
+        <p class="text-sm opacity-80">基于迅排设计开源项目，支持拖拽编辑、模板套用、图片处理等功能</p>
+      </div>
+      <a href="/design/" target="_blank" class="px-6 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-gray-100 transition">
+        打开设计器 →
+      </a>
+    </div>
+    
     <div class="flex gap-6">
       <!-- 左侧功能菜单 -->
       <div class="w-64 bg-white rounded-xl shadow-sm p-4">
