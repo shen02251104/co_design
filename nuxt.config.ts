@@ -59,7 +59,7 @@ export default defineNuxtConfig({
   },
 
   // Nuxt modules
-  // Skip @nuxt/image in CI (requires sharp binaries not available in headless environments)
+  // Skip @nuxt/image and @pinia/nuxt in CI (requires sharp binaries not available in headless environments)
   modules:
     process.env.CI === 'true'
       ? ['@nuxtjs/tailwindcss']

@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 
@@ -116,8 +116,7 @@ public class DesignController {
             @Parameter(description = "返回类型") @RequestParam(required = false, defaultValue = "file") String type,
             @Parameter(description = "缩放尺寸") @RequestParam(required = false) Integer size,
             @Parameter(description = "图片质量") @RequestParam(required = false, defaultValue = "75") Integer quality,
-            @Parameter(description = "等待时间ms") @RequestParam(required = false, defaultValue = "0") Long wait,
-            HttpServletResponse response
+            @Parameter(description = "等待时间ms") @RequestParam(required = false, defaultValue = "0") Long wait
     ) {
         try {
             ScreenshotDTO dto = new ScreenshotDTO();

@@ -17,10 +17,26 @@
   },
   "dependencies": {
     "@nuxt/image": "^1.8.1",
+    "@pinia/nuxt": "^0.11.3",
+    "@scena/guides": "^0.29.2",
+    "cropperjs": "^2.1.1",
+    "dayjs": "^1.11.21",
+    "element-plus": "^2.14.2",
+    "fontfaceobserver": "^2.3.0",
+    "html2canvas": "^1.4.1",
+    "mitt": "^3.0.1",
+    "moveable": "^0.53.0",
+    "moveable-helper": "^0.4.0",
+    "nanoid": "^5.1.11",
     "nuxt": "^4.3.1",
+    "pinia": "^3.0.4",
+    "qr-code-styling": "^1.9.2",
+    "selecto": "^1.26.3",
     "tailwind-merge": "^2.6.0",
+    "throttle-debounce": "^5.0.2",
     "vue": "^3.5.30",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "vuedraggable": "4"
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.14.0",
