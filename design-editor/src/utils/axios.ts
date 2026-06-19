@@ -53,6 +53,10 @@ axios.interceptors.response.use((res: AxiosResponse<any>) => {
       // store.commit('changeOnline', false)
     }
 
+    // 兼容 YiDesign 后端格式: { code: 200, data: {...}, success: true }
+    if (res.data.code === 200 && res.data.data !== undefined) {
+      return Promise.resolve(res.data.data)
+    }
     if (res.data.result && res.data.code === 200) {
       return Promise.resolve(res.data.result)
     } else if (res.data.data && res.data.stat == 1) {
