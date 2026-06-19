@@ -57,8 +57,8 @@ const CanvasStore = defineStore<"canvasStore", TCanvasState, {}, TStoreAction>("
     },
     /** 强制重绘画布 */
     reChangeCanvas() {
-      // const tag = this.dPage.tag
-      // this.dPage.tag = tag === 0 ? 0.01 : 0
+      const tag = this.dPage.tag || 0
+      this.dPage.tag = tag === 0 ? 0.01 : 0
     },
     /** 更新 Page 字段 */
     updatePageData({ key, value }) {
