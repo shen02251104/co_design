@@ -66,15 +66,20 @@ export default defineConfig({
     headers: {
       'Cache-Control': 'no-store, no-cache, must-revalidate',
     },
+    // 禁用文件系统缓存
+    watch: {
+      usePolling: true,
+      interval: 100,
+    },
     proxy: {
-      // 代理到 Nuxt 服务器（端口 5000）- 将 /design 转为 /api/design
+      // 代理到 Java 后端（端口 8080）
       '/design': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8080/api',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/design/, '/api/design'),
+        rewrite: (path) => path.replace(/^\/design/, ''),
       },
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
     },
