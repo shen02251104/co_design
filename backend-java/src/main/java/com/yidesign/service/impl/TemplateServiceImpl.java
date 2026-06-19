@@ -35,9 +35,9 @@ public class TemplateServiceImpl implements TemplateService {
     public Map<String, Object> getTemplateList(String search, Integer page, Integer pageSize, Integer cate, Integer type) {
         QueryWrapper<DesignTemplate> wrapper = new QueryWrapper<>();
         
-        // type=1 为组件列表
+        // type=1 为组件列表，返回模拟数据（文字模板等）
         if (type != null && type == 1) {
-            wrapper.eq("type", 1); // 组件类型
+            return getMockComponentList(cateStr);
         } else {
             // 模板列表（type=0 或 null）
             if (cate != null && cate > 0) {
@@ -174,5 +174,63 @@ public class TemplateServiceImpl implements TemplateService {
         }
         wrapper.eq("is_public", 1);
         return templateMapper.selectCount(wrapper);
+    }
+    
+    /**
+     * 返回模拟的组件数据（文字模板、组合模板等）
+     * type=1 表示组件列表
+     */
+    private Object getMockComponentList(String cate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        
+        // 根据分类返回不同的组件
+        if ("text".equals(cate)) {
+            // 文字组件
+            for (int i = 1; i <= 5; i++) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", 100 + i);
+                item.put("title", "文字模板" + i);
+                item.put("cover", "https://via.placeholder.com/200x100?text=Text+" + i);
+                item.put("url", "https://via.placeholder.com/200x100?text=Text+" + i);
+                item.put("width", 200);
+                item.put("height", 100);
+                item.put("state", 1);
+                // 组件数据格式
+                item.put("data", "[{\"global\":{\"width\":200,\"height\":100,\"backgroundColor\":\"#ffffff\"},\"layers\":[{\"type\":\"text\",\"text\":\"文字模板" + i + "\",\"left\":10,\"top\":10,\"width\":180,\"height\":80,\"fontSize\":24,\"color\":\"#333333\"}]}]");
+                list.add(item);
+            }
+        } else if ("svg".equals(cate)) {
+            // SVG组件
+            for (int i = 1; i <= 3; i++) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", 200 + i);
+                item.put("title", "图形" + i);
+                item.put("cover", "https://via.placeholder.com/100x100?text=SVG+" + i);
+                item.put("url", "https://via.placeholder.com/100x100?text=SVG+" + i);
+                item.put("width", 100);
+                item.put("height", 100);
+                item.put("state", 1);
+                item.put("data", "[{\"global\":{\"width\":100,\"height\":100,\"backgroundColor\":\"#ffffff\"},\"layers\":[{\"type\":\"rect\",\"left\":0,\"top\":0,\"width\":100,\"height\":100,\"fill\":\"#" + String.format("%06x", i * 111111) + "\"}]}]");
+                list.add(item);
+            }
+        } else {
+            // 默认返回一些组合组件
+            for (int i = 1; i <= 3; i++) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", 300 + i);
+                item.put("title", "组合模板" + i);
+                item.put("cover", "https://via.placeholder.com/200x200?text=Combo+" + i);
+                item.put("url", "https://via.placeholder.com/200x200?text=Combo+" + i);
+                item.put("width", 200);
+                item.put("height", 200);
+                item.put("state", 1);
+                list.add(item);
+            }
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", list);
+        result.put("total", list.size());
+        return result;
     }
 }
