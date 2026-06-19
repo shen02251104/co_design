@@ -62,6 +62,7 @@ public class TemplateServiceImpl implements TemplateService {
             item.setId(t.getId());
             item.setTitle(t.getName());
             item.setCover(t.getPreviewUrl());
+            item.setUrl(t.getPreviewUrl());  // url 与 cover 相同
             item.setWidth(t.getWidth());
             item.setHeight(t.getHeight());
             item.setState(t.getIsPublic() != null ? t.getIsPublic() : 1);

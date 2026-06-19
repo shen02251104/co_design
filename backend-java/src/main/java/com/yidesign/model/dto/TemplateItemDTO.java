@@ -10,6 +10,7 @@ public class TemplateItemDTO {
     private Long id;            // 模板ID
     private String title;       // 模板名称（前端期望title）
     private String cover;       // 封面URL（前端期望cover）
+    private String url;         // 图片URL（前端期望url，与cover相同）
     private Integer width;      // 宽度
     private Integer height;     // 高度
     private Integer state;      // 状态（前端期望state）
