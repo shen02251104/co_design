@@ -17,9 +17,9 @@ export default {
   VERSION: version,
   APP_NAME: '易设计',
   COPYRIGHT: 'YiDesign - 电商设计平台',
-  API_URL: isDev ? 'http://localhost:5000' : '', // 后端地址 - 指向Java后端
-  SCREEN_URL: isDev ? 'http://localhost:5000' : '', // 截图服务地址
-  IMG_URL: isDev ? '/api/design/file/' : '/api/design/file/', // 本地文件服务
+  API_URL: isDev ? '' : '/api', // 开发环境使用相对路径，通过vite代理
+  SCREEN_URL: isDev ? '' : '/api', // 截图服务地址
+  IMG_URL: '/api/design/file/', // 本地文件服务
   // ICONFONT_URL: '//at.alicdn.com/t/font_3223711_74mlzj4jdue.css',
   ICONFONT_URL: '//at.alicdn.com/t/font_2717063_ypy8vprc3b.css?display=swap',
   ICONFONT_EXTRA: '//at.alicdn.com/t/c/font_3228074_xojoer6zhp.css',

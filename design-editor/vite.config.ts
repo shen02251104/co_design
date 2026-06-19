@@ -61,8 +61,14 @@ export default defineConfig({
     hmr: { overlay: false },
     port: 5173,  // 独立端口
     proxy: {
+      // 代理设计器API到Java后端
+      '/design': {
+        target: 'http://localhost:5000/api',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
       '/api': {
-        target: 'http://localhost:5000',  // 代理到主站后端
+        target: 'http://localhost:5000',
         changeOrigin: true,
       },
     },
