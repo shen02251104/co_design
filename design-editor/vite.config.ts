@@ -72,14 +72,14 @@ export default defineConfig({
       interval: 100,
     },
     proxy: {
-      // 代理到 Java 后端（端口 8080）
+      // 代理到 Nuxt server API（端口 5000）- Java 后端无法运行时使用
       '/design': {
-        target: 'http://localhost:8080/api',
+        target: 'http://localhost:5000/api/design',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/design/, ''),
       },
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:5000',
         changeOrigin: true,
       },
     },
