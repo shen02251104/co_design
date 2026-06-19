@@ -27,14 +27,22 @@ public class TemplateServiceImpl implements TemplateService {
     private DesignTemplateMapper templateMapper;
 
     @Override
-    public Map<String, Object> getTemplateList(String search, Integer page, Integer pageSize, Integer cate) {
+    public Map<String, Object> getTemplateList(String search, Integer page, Integer pageSize, Integer cate, Integer type) {
         QueryWrapper<DesignTemplate> wrapper = new QueryWrapper<>();
-        if (cate != null && cate > 0) {
-            wrapper.eq("category_id", cate);
+        
+        // type=1 为组件列表
+        if (type != null && type == 1) {
+            wrapper.eq("type", 1); // 组件类型
+        } else {
+            // 模板列表（type=0 或 null）
+            if (cate != null && cate > 0) {
+                wrapper.eq("category_id", cate);
+            }
+            if (search != null && !search.isEmpty()) {
+                wrapper.like("name", search);
+            }
         }
-        if (search != null && !search.isEmpty()) {
-            wrapper.like("name", search);
-        }
+        
         wrapper.eq("is_public", 1);
         wrapper.orderByDesc("created_at");
         

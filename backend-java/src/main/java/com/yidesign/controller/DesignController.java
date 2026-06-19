@@ -157,16 +157,17 @@ public class DesignController {
         }
     }
 
-    @Operation(summary = "模板列表", description = "获取设计模板列表")
+    @Operation(summary = "模板/组件列表", description = "获取设计模板或组件列表，type=1为组件")
     @GetMapping("/design/list")
     public Result<Object> getTemplates(
             @Parameter(description = "搜索关键词") @RequestParam(required = false) String search,
             @Parameter(description = "页码") @RequestParam(required = false, defaultValue = "1") Integer page,
             @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer pageSize,
-            @Parameter(description = "分类") @RequestParam(required = false, defaultValue = "0") Integer cate
+            @Parameter(description = "分类") @RequestParam(required = false, defaultValue = "0") Integer cate,
+            @Parameter(description = "类型：type=1为组件列表") @RequestParam(required = false) Integer type
     ) {
         try {
-            return Result.success(templateService.getTemplateList(search, page, pageSize, cate));
+            return Result.success(templateService.getTemplateList(search, page, pageSize, cate, type));
         } catch (Exception e) {
             return Result.error("获取模板失败: " + e.getMessage());
         }

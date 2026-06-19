@@ -10,9 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 public interface TemplateService {
     
     /**
-     * 获取模板列表
+     * 获取模板/组件列表
+     * @param type 类型：1=组件，null/0=模板
      */
-    Map<String, Object> getTemplateList(String search, Integer page, Integer pageSize, Integer cate);
+    Map<String, Object> getTemplateList(String search, Integer page, Integer pageSize, Integer cate, Integer type);
     
     /**
      * 获取模板详情
