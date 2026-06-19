@@ -17,11 +17,16 @@ export function setTemplate(store: TWidgetStore, allWidgets: TdWidgetData[]) {
   // const historyStore = useHistoryStore()
   const canvasStore = useCanvasStore()
   const widgetStore = useWidgetStore()
-  allWidgets.forEach((item) => {
+  console.log('setTemplate - 接收到的 allWidgets:', allWidgets)
+  console.log('setTemplate - allWidgets 类型:', typeof allWidgets, Array.isArray(allWidgets))
+  allWidgets.forEach((item, index) => {
+    console.log(`setTemplate - 处理第 ${index} 个 widget:`, item)
     Number(item.uuid) < 0 && (item.uuid = nanoid()) // 重设id
     item.text && (item.text = decodeURIComponent(item.text))
     store.dWidgets.push(item)
   })
+  console.log('setTemplate - 处理后 store.dWidgets:', store.dWidgets)
   widgetStore.updateDWidgets()
   canvasStore.reChangeCanvas()
+  console.log('setTemplate - 完成')
 }
