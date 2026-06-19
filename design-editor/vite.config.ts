@@ -15,7 +15,7 @@ const resolve = (...data: string[]) => path.resolve(__dirname, ...data)
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/design/',  // 集成到主站的路径
+  // base: '/design/',  // 生产环境部署路径，开发环境注释掉
   plugins: [
     vue(),
     viteCompression({
@@ -38,6 +38,7 @@ export default defineConfig({
       },
     },
     outDir: 'dist',
+    base: '/design/',  // 生产构建时使用
   },
   resolve: {
     alias: {
@@ -61,11 +62,10 @@ export default defineConfig({
     hmr: { overlay: false },
     port: 5173,  // 独立端口
     proxy: {
-      // 代理设计器API到Java后端
-      '/design': {
+      // 只代理 API 请求（design/list, design/material 等）
+      '^/design/(list|material|cate|temp|image|imgs)': {
         target: 'http://localhost:5000/api',
         changeOrigin: true,
-        rewrite: (path) => path,
       },
       '/api': {
         target: 'http://localhost:5000',

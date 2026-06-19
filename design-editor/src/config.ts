@@ -13,7 +13,7 @@ import { version } from '../package.json'
 
 export default {
   isDev,
-  BASE_URL: isDev ? '/design/' : '/design/',
+  BASE_URL: isDev ? '/' : '/design/',  // 开发环境根路径，生产环境子路径
   VERSION: version,
   APP_NAME: '易设计',
   COPYRIGHT: 'YiDesign - 电商设计平台',
