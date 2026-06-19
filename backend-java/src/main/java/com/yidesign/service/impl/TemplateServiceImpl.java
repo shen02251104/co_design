@@ -86,18 +86,8 @@ public class TemplateServiceImpl implements TemplateService {
         result.put("width", template.getWidth());
         result.put("height", template.getHeight());
         
-        // 将 template_data JSON字符串解析为对象数组，前端期望 [{global, layers}] 格式
-        try {
-            if (template.getTemplateData() != null && !template.getTemplateData().isEmpty()) {
-                ObjectMapper mapper = new ObjectMapper();
-                Object dataObj = mapper.readValue(template.getTemplateData(), Object.class);
-                result.put("data", dataObj);
-            } else {
-                result.put("data", new ArrayList<>());
-            }
-        } catch (Exception e) {
-            result.put("data", new ArrayList<>());
-        }
+        // 返回原始 JSON 字符串，前端会用 JSON.parse 解析
+        result.put("data", template.getTemplateData() != null ? template.getTemplateData() : "[]");
         
         result.put("category", template.getCategoryId());
         result.put("state", template.getIsPublic());
