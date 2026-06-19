@@ -54,11 +54,18 @@ async function load() {
     let content = JSON.parse(data)
     const isGroupTemplate = Number(type) == 1
 
+    console.log('Draw.vue - 解析后的 content:', content)
+    console.log('Draw.vue - content 是否是数组:', Array.isArray(content))
+    
     if (Array.isArray(content) && !isGroupTemplate) {
       const { global, layers } = content[index]
+      console.log('Draw.vue - global:', global)
+      console.log('Draw.vue - layers:', layers)
       content = {page: global, widgets: layers}
     }
     const widgets = isGroupTemplate ? content : content.widgets
+    console.log('Draw.vue - 最终的 widgets:', widgets)
+    console.log('Draw.vue - widgets 数量:', widgets?.length)
     
     if (isGroupTemplate) {
       dPage.value.width = width
@@ -66,16 +73,26 @@ async function load() {
       dPage.value.backgroundColor = '#ffffff00'
       widgetStore.addGroup(content)
     } else {
+      console.log('Draw.vue - 调用 setDPage 前, dPage.value.uuid:', dPage.value.uuid)
+      console.log('Draw.vue - content.page:', content.page)
+      console.log('Draw.vue - content.page.uuid:', content.page?.uuid)
       pageStore.setDPage(content.page)
+      console.log('Draw.vue - 调用 setDPage 后, dPage.value.uuid:', dPage.value.uuid)
       // 移除背景图，作为独立事件
       backgroundImage = content.page?.backgroundImage
       backgroundImage && delete content.page.backgroundImage
       pageStore.setDPage(content.page)
+      console.log('Draw.vue - 再次 setDPage 后, dPage.value.uuid:', dPage.value.uuid)
+      console.log('Draw.vue - 准备调用 setTemplate, widgets parent 检查:')
+      widgets.forEach((w: any, i: number) => {
+        console.log(`  widget[${i}] uuid=${w.uuid}, parent=${w.parent}, type=${w.type}`)
+      })
       if (id) {
         widgetStore.setDWidgets(widgets)
       } else {
         widgetStore.setTemplate(widgets)
       }
+      console.log('Draw.vue - setTemplate 后, widgetStore.dWidgets 数量:', widgetStore.dWidgets.length)
     }
 
     await nextTick()
