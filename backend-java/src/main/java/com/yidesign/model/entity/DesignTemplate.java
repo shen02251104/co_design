@@ -17,14 +17,14 @@ public class DesignTemplate {
     private Long id;
     
     /**
-     * 模板名称
-     */
-    private String name;
-    
-    /**
      * 模板分类ID
      */
     private Long categoryId;
+    
+    /**
+     * 模板名称
+     */
+    private String name;
     
     /**
      * 模板类型：poster/banner/card等
@@ -47,18 +47,21 @@ public class DesignTemplate {
     private String previewUrl;
     
     /**
-     * 模板数据（JSON格式）
+     * 模板数据（JSON格式）- 映射到数据库 canvas_data 字段
      */
+    @TableField("template_data")
     private String templateData;
     
     /**
      * 是否公开：0-私有，1-公开
      */
+    @TableField("is_public")
     private Integer isPublic;
     
     /**
      * 创建者ID
      */
+    @TableField("creator_id")
     private Long creatorId;
     
     /**
@@ -69,12 +72,12 @@ public class DesignTemplate {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    @TableField(value = "created_at", fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
     
     /**
      * 更新时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
+    @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
 }
