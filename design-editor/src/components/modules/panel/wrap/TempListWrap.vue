@@ -151,6 +151,8 @@ async function selectItem(item: IGetTempListData) {
     if (Array.isArray(result)) {
       const { global, layers } = result[0]
       console.log('模板详情 - 数组格式, layers:', layers?.length)
+      console.log('模板详情 - layers内容:', JSON.stringify(layers, null, 2))
+      console.log('模板详情 - 第一个widget的parent:', layers?.[0]?.parent)
       pageStore.setDPage(global)
       widgetStore.setTemplate(layers)
     } else {
