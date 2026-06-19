@@ -20,17 +20,17 @@ INSERT INTO template_category (id, name, icon, sort_order, status) VALUES
 (6, '电商详情页', 'icon-detail', 6, 1)
 ON DUPLICATE KEY UPDATE name=VALUES(name);
 
--- 3. 初始化测试模板数据
+-- 3. 初始化测试模板数据（template_data格式匹配迅排设计：[{global, layers}] 或 {page, widgets}）
 INSERT INTO design_template (id, category_id, name, type, width, height, preview_url, template_data, is_public, creator_id, use_count, created_at) VALUES
-(1, 1, '双十一促销海报', 'poster', 800, 1200, 'https://picsum.photos/800/1200?random=1', '{"elements":[{"type":"text","content":"双十一大促","x":100,"y":50,"fontSize":48,"color":"#FF0000"},{"type":"image","url":"https://picsum.photos/600/400","x":100,"y":200}]}', 1, 0, 100, NOW()),
-(2, 1, '618年中大促', 'poster', 750, 1000, 'https://picsum.photos/750/1000?random=2', '{"elements":[{"type":"text","content":"618狂欢购","x":50,"y":30,"fontSize":56,"color":"#FF6B00"}]}', 1, 0, 80, NOW()),
-(3, 2, '新品上市Banner', 'banner', 1920, 400, 'https://picsum.photos/1920/400?random=3', '{"elements":[{"type":"text","content":"新品首发","x":500,"y":150,"fontSize":72}]}', 1, 0, 50, NOW()),
-(4, 2, '限时折扣Banner', 'banner', 1200, 300, 'https://picsum.photos/1200/300?random=4', '{"elements":[{"type":"text","content":"限时特惠","x":400,"y":100,"fontSize":48}]}', 1, 0, 45, NOW()),
-(5, 3, '朋友圈分享图', 'poster', 1080, 1080, 'https://picsum.photos/1080/1080?random=5', '{"elements":[{"type":"text","content":"分享生活","x":400,"y":500}]}', 1, 0, 30, NOW()),
-(6, 4, '公众号封面', 'banner', 900, 383, 'https://picsum.photos/900/383?random=6', '{"elements":[{"type":"text","content":"每周精选","x":350,"y":150}]}', 1, 0, 25, NOW()),
-(7, 5, '小红书图文', 'poster', 1080, 1440, 'https://picsum.photos/1080/1440?random=7', '{"elements":[{"type":"text","content":"好物推荐","x":400,"y":100}]}', 1, 0, 20, NOW()),
-(8, 6, '电商详情页头图', 'banner', 750, 350, 'https://picsum.photos/750/350?random=8', '{"elements":[{"type":"text","content":"商品详情","x":300,"y":100}]}', 1, 0, 15, NOW())
-ON DUPLICATE KEY UPDATE name=VALUES(name);
+(1, 1, '双十一促销海报', 'poster', 800, 1200, 'https://picsum.photos/800/1200?random=1', '[{"global":{"width":800,"height":1200,"backgroundColor":"#FFFFFF"},"layers":[{"type":"text","text":"双十一大促","left":100,"top":50,"fontSize":48,"color":"#FF0000","uuid":"-1"},{"type":"image","src":"https://picsum.photos/600/400","left":100,"top":200,"width":600,"height":400,"uuid":"-2"}]}]', 1, 0, 100, NOW()),
+(2, 1, '618年中大促', 'poster', 750, 1000, 'https://picsum.photos/750/1000?random=2', '[{"global":{"width":750,"height":1000,"backgroundColor":"#FFE4B5"},"layers":[{"type":"text","text":"618狂欢购","left":50,"top":30,"fontSize":56,"color":"#FF6B00","uuid":"-1"}]}]', 1, 0, 80, NOW()),
+(3, 2, '新品上市Banner', 'banner', 1920, 400, 'https://picsum.photos/1920/400?random=3', '[{"global":{"width":1920,"height":400,"backgroundColor":"#E8F5E9"},"layers":[{"type":"text","text":"新品首发","left":500,"top":150,"fontSize":72,"color":"#2196F3","uuid":"-1"}]}]', 1, 0, 50, NOW()),
+(4, 2, '限时折扣Banner', 'banner', 1200, 300, 'https://picsum.photos/1200/300?random=4', '[{"global":{"width":1200,"height":300,"backgroundColor":"#FFF3E0"},"layers":[{"type":"text","text":"限时特惠","left":400,"top":100,"fontSize":48,"color":"#FF5722","uuid":"-1"}]}]', 1, 0, 45, NOW()),
+(5, 3, '朋友圈分享图', 'poster', 1080, 1080, 'https://picsum.photos/1080/1080?random=5', '[{"global":{"width":1080,"height":1080,"backgroundColor":"#F5F5F5"},"layers":[{"type":"text","text":"分享生活","left":400,"top":500,"fontSize":36,"color":"#333333","uuid":"-1"}]}]', 1, 0, 30, NOW()),
+(6, 4, '公众号封面', 'banner', 900, 383, 'https://picsum.photos/900/383?random=6', '[{"global":{"width":900,"height":383,"backgroundColor":"#E1F5FE"},"layers":[{"type":"text","text":"每周精选","left":350,"top":150,"fontSize":42,"color":"#0277BD","uuid":"-1"}]}]', 1, 0, 25, NOW()),
+(7, 5, '小红书图文', 'poster', 1080, 1440, 'https://picsum.photos/1080/1440?random=7', '[{"global":{"width":1080,"height":1440,"backgroundColor":"#FCE4EC"},"layers":[{"type":"text","text":"好物推荐","left":400,"top":100,"fontSize":48,"color":"#E91E63","uuid":"-1"}]}]', 1, 0, 20, NOW()),
+(8, 6, '电商详情页头图', 'banner', 750, 350, 'https://picsum.photos/750/350?random=8', '[{"global":{"width":750,"height":350,"backgroundColor":"#F3E5F5"},"layers":[{"type":"text","text":"商品详情","left":300,"top":100,"fontSize":36,"color":"#9C27B0","uuid":"-1"}]}]', 1, 0, 15, NOW())
+ON DUPLICATE KEY UPDATE template_data=VALUES(template_data);
 
 -- 4. 初始化素材分类
 INSERT INTO material_category (id, name, type, icon, sort_order, status) VALUES
