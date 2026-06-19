@@ -2,6 +2,13 @@
 import { getTemplates } from '../../utils/db'
 
 export default defineEventHandler(async (event) => {
+  // 设置禁止缓存的 header
+  setResponseHeaders(event, {
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  })
+  
   const query = getQuery(event)
   const type = query.type || ''
   const cate = query.cate || ''
