@@ -107,26 +107,58 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public String saveTemplate(TemplateDTO template) {
-        DesignTemplate entity = template.getTemplate();
-        if (entity == null) {
-            entity = new DesignTemplate();
+        DesignTemplate entity = new DesignTemplate();
+        
+        // 处理ID：如果有ID则更新，没有则新增
+        boolean isUpdate = template.getId() != null && !template.getId().isEmpty();
+        if (isUpdate) {
+            entity = templateMapper.selectById(Long.parseLong(template.getId()));
+            if (entity == null) {
+                entity = new DesignTemplate();
+                isUpdate = false;
+            }
         }
+        
         // 从DTO中提取数据设置到entity
         if (template.getTitle() != null) {
             entity.setName(template.getTitle());
         }
+        if (template.getName() != null) {
+            entity.setName(template.getName());
+        }
         if (template.getCategory() != null) {
-            entity.setCategoryId(Long.parseLong(template.getCategory()));
+            try {
+                entity.setCategoryId(Long.parseLong(template.getCategory()));
+            } catch (NumberFormatException e) {
+                // 忽略无效的分类ID
+            }
         }
         if (template.getThumb() != null) {
             entity.setPreviewUrl(template.getThumb());
         }
-        if (template.getContent() != null) {
+        if (template.getThumbnail() != null) {
+            entity.setPreviewUrl(template.getThumbnail());
+        }
+        // 处理设计数据：支持 data 和 content 字段
+        if (template.getData() != null) {
+            entity.setTemplateData(template.getData());
+        } else if (template.getContent() != null) {
             entity.setTemplateData(template.getContent());
+        }
+        // 处理宽高
+        if (template.getWidth() != null) {
+            entity.setWidth(template.getWidth());
+        }
+        if (template.getHeight() != null) {
+            entity.setHeight(template.getHeight());
         }
         entity.setIsPublic(1);
         
-        templateMapper.insert(entity);
+        if (isUpdate) {
+            templateMapper.updateById(entity);
+        } else {
+            templateMapper.insert(entity);
+        }
         return entity.getId().toString();
     }
 
