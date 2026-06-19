@@ -28,6 +28,11 @@ export function setTemplate(store: TWidgetStore, allWidgets: TdWidgetData[]) {
     if (item.type === 'qrcode') item.type = 'w-qrcode'
     if (item.type === 'svg') item.type = 'w-svg'
     if (item.type === 'group') item.type = 'w-group'
+    // 修复 parent 字段：如果没有 parent，设置为 "-1"（页面根节点）
+    if (!item.parent) {
+      item.parent = '-1'
+      console.log(`setTemplate - widget ${index} 自动设置 parent: '-1'`)
+    }
     console.log(`setTemplate - widget ${index} 处理后:`, item)
     item.text && (item.text = decodeURIComponent(item.text))
     store.dWidgets.push(item)
