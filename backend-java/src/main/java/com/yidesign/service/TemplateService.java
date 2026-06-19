@@ -33,9 +33,3 @@ public interface TemplateService {
      */
     Object getPhotos(String cate, Integer page, Integer pageSize);
 }
-    
-    /**
-     * 获取图片素材
-     */
-    Object getPhotos(String keyword);
-}
