@@ -76,11 +76,6 @@ const CanvasStore = defineStore<"canvasStore", TCanvasState, {}, TStoreAction>("
     setDPage(data: TPageState) {
       console.log('setDPage - 接收到的 data:', data)
       console.log('setDPage - data.uuid:', data.uuid)
-      // 如果没有 uuid，自动设置为 "-1"（页面根节点标识）
-      if (!data.uuid) {
-        data.uuid = '-1'
-        console.log('setDPage - 自动设置 uuid: -1')
-      }
       this.dPage = data
       this.updateDPage()
       console.log('setDPage - 设置后 dPage:', this.dPage)
