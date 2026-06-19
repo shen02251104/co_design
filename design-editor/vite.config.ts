@@ -62,14 +62,14 @@ export default defineConfig({
     hmr: { overlay: false },
     port: 5173,  // 独立端口
     proxy: {
-      // 代理到 Java 后端（端口 8080）
+      // 代理到 Nuxt 服务器（端口 5000）- 将 /design 转为 /api/design
       '/design': {
-        target: 'http://localhost:8080/api',
+        target: 'http://localhost:5000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/design/, '/design'),
+        rewrite: (path) => path.replace(/^\/design/, '/api/design'),
       },
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:5000',
         changeOrigin: true,
       },
     },

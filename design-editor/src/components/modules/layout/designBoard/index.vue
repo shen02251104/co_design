@@ -379,7 +379,12 @@ async function handleSelection(e: MouseEvent) {
 }
 
 function getlayers() {
-  return dWidgets.value.filter((item) => item.parent === dPage.value.uuid)
+  console.log('getlayers - dPage.value.uuid:', dPage.value.uuid)
+  console.log('getlayers - dWidgets.value:', dWidgets.value)
+  console.log('getlayers - widgets parents:', dWidgets.value.map(w => ({ uuid: w.uuid, parent: w.parent, type: w.type })))
+  const filtered = dWidgets.value.filter((item) => item.parent === dPage.value.uuid)
+  console.log('getlayers - filtered layers:', filtered)
+  return filtered
 }
 
 function getChilds(uuid: string) {

@@ -74,8 +74,11 @@ const CanvasStore = defineStore<"canvasStore", TCanvasState, {}, TStoreAction>("
     },
     /** 设置 Page */
     setDPage(data: TPageState) {
+      console.log('setDPage - 接收到的 data:', data)
+      console.log('setDPage - data.uuid:', data.uuid)
       this.dPage = data
       this.updateDPage()
+      console.log('setDPage - 设置后 dPage:', this.dPage)
       // const cur = this.dPage
       // const keys = Object.keys(data) as (keyof TPageState)[];
       // keys.forEach(val => {
@@ -86,6 +89,7 @@ const CanvasStore = defineStore<"canvasStore", TCanvasState, {}, TStoreAction>("
     updateDPage() {
       const widgetStore = useWidgetStore()
       widgetStore.dLayouts[this.dCurrentPage].global = this.dPage
+      console.log('updateDPage - dLayouts:', widgetStore.dLayouts)
       // const cur = this.dPage
       // const keys = Object.keys(data) as (keyof TPageState)[];
       // keys.forEach(val => {

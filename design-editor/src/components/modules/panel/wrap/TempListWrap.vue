@@ -142,7 +142,10 @@ async function selectItem(item: IGetTempListData) {
       console.log('模板详情 - 调用API获取')
       const res = await api.home.getTempDetail({ id: item.id })
       console.log('模板详情 - API返回:', res)
-      result = JSON.parse(res.data)
+      // axios 拦截器返回 data 对象 { data: "...", width: 800, height: 600 }
+      // res 是对象，res.data 是 JSON 字符串
+      const dataStr = typeof res === 'string' ? res : res.data
+      result = JSON.parse(dataStr)
     } else {
       console.log('模板详情 - 使用列表data, 长度:', item.data?.length)
       result = JSON.parse(item.data)
