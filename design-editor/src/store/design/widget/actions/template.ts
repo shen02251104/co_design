@@ -58,6 +58,35 @@ export function setTemplate(store: TWidgetStore, allWidgets: TdWidgetData[]) {
       if (!item.record) item.record = { width: 0, height: 0, minWidth: item.fontSize || 24, minHeight: (item.fontSize || 24) * 1.2, dir: 'horizontal' }
       console.log(`setTemplate - widget ${index} 补充文本默认字段`)
     }
+    // 为图片组件补充必需的默认字段
+    if (item.type === 'w-image') {
+      // PSD 解析出的数据可能用 src 字段，需转换为 imgUrl
+      if (item.src && !item.imgUrl) {
+        item.imgUrl = item.src
+        delete item.src
+        console.log(`setTemplate - widget ${index} 转换 src -> imgUrl: ${item.imgUrl}`)
+      }
+      if (!item.opacity) item.opacity = 1
+      if (!item.zoom) item.zoom = 1
+      if (!item.rotate) item.rotate = 0
+      if (!item.radius) item.radius = 0
+      if (!item.record) item.record = { width: 0, height: 0, minWidth: 10, minHeight: 10, dir: 'all' }
+      if (!item.filter) item.filter = { contrast: 0, sharpness: 0, hueRotate: 0, saturate: 0, brightness: 0, gaussianBlur: 0, temperature: 0, tint: 0 }
+      console.log(`setTemplate - widget ${index} 补充图片默认字段`)
+    }
+    // 为二维码组件补充必需的默认字段
+    if (item.type === 'w-qrcode') {
+      if (!item.opacity) item.opacity = 1
+      if (!item.zoom) item.zoom = 1
+      if (!item.rotate) item.rotate = 0
+      if (!item.radius) item.radius = 0
+      if (!item.dotType) item.dotType = 'classy'
+      if (!item.dotColorType) item.dotColorType = 'single'
+      if (!item.dotColor) item.dotColor = '#35495E'
+      if (!item.record) item.record = { width: 0, height: 0, minWidth: 10, minHeight: 10, dir: 'all' }
+      if (!item.filter) item.filter = { contrast: 0, sharpness: 0, hueRotate: 0, saturate: 0, brightness: 0, gaussianBlur: 0, temperature: 0, tint: 0 }
+      console.log(`setTemplate - widget ${index} 补充二维码默认字段`)
+    }
     console.log(`setTemplate - widget ${index} 处理后:`, item)
     item.text && (item.text = decodeURIComponent(item.text))
     store.dWidgets.push(item)
