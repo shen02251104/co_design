@@ -138,14 +138,17 @@ async function selectItem(item: IGetTempListData) {
   try {
     let result = null
     console.log('模板详情 - item:', item)
-    // 强制调用 API，忽略 item.data（确保获取最新数据）
-    console.log('模板详情 - 强制调用API获取')
-    const res = await api.home.getTempDetail({ id: item.id })
-    console.log('模板详情 - API返回:', res)
-    // axios 拦截器返回 data 对象 { data: "...", width: 800, height: 600 }
-    // res 是对象，res.data 是 JSON 字符串
-    const dataStr = typeof res === 'string' ? res : res.data
-    result = JSON.parse(dataStr)
+    // 如果 item.data 存在，直接解析；否则调用 API 获取
+    if (item.data) {
+      console.log('模板详情 - 使用列表data，长度:', item.data.length)
+      result = JSON.parse(item.data)
+    } else {
+      console.log('模板详情 - 调用API获取')
+      const res = await api.home.getTempDetail({ id: item.id })
+      console.log('模板详情 - API返回:', res)
+      const dataStr = typeof res === 'string' ? res : res.data
+      result = JSON.parse(dataStr)
+    }
     console.log('模板详情 - 解析后:', result)
     if (Array.isArray(result)) {
       const { global, layers } = result[0]

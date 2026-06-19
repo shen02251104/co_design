@@ -68,8 +68,8 @@ public class TemplateServiceImpl implements TemplateService {
             item.setHeight(t.getHeight());
             item.setState(t.getIsPublic() != null ? t.getIsPublic() : 1);
             item.setThumb(t.getPreviewUrl());
-            // 不返回 data 字段，让前端调用 API 获取详情
-            // item.setData(t.getTemplateData());
+            // 返回 data 字段（template_data），前端可以直接使用
+            item.setData(t.getTemplateData());
             return item;
         }).collect(Collectors.toList());
         
