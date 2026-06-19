@@ -61,6 +61,11 @@ export default defineConfig({
   server: {
     hmr: { overlay: false },
     port: 5173,  // 独立端口
+    // 强制禁用缓存，确保每次都重新编译
+    force: true,
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    },
     proxy: {
       // 代理到 Nuxt 服务器（端口 5000）- 将 /design 转为 /api/design
       '/design': {
