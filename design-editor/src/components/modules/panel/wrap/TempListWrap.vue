@@ -135,28 +135,39 @@ async function selectItem(item: IGetTempListData) {
   widgetStore.setDWidgets([])
   setTempId(item.id)
 
-  let result = null
-  if (!item.data) {
-    const res = await api.home.getTempDetail({ id: item.id })
-    result = JSON.parse(res.data)
-  } else {
-    result = JSON.parse(item.data)
+  try {
+    let result = null
+    console.log('模板详情 - item:', item)
+    if (!item.data) {
+      console.log('模板详情 - 调用API获取')
+      const res = await api.home.getTempDetail({ id: item.id })
+      console.log('模板详情 - API返回:', res)
+      result = JSON.parse(res.data)
+    } else {
+      console.log('模板详情 - 使用列表data, 长度:', item.data?.length)
+      result = JSON.parse(item.data)
+    }
+    console.log('模板详情 - 解析后:', result)
+    if (Array.isArray(result)) {
+      const { global, layers } = result[0]
+      console.log('模板详情 - 数组格式, layers:', layers?.length)
+      pageStore.setDPage(global)
+      widgetStore.setTemplate(layers)
+    } else {
+      const { page, widgets } = result
+      console.log('模板详情 - 对象格式, widgets:', widgets?.length)
+      pageStore.setDPage(page)
+      widgetStore.setTemplate(widgets)
+    }
+    setTimeout(() => {
+      forceStore.setZoomScreenChange()
+    }, 300)
+    widgetStore.selectWidget({
+      uuid: '-1',
+    })
+  } catch (e) {
+    console.error('模板详情 - 加载失败:', e)
   }
-  if (Array.isArray(result)) {
-    const { global, layers } = result[0]
-    pageStore.setDPage(global)
-    widgetStore.setTemplate(layers)
-  } else {
-    const { page, widgets } = result
-    pageStore.setDPage(page)
-    widgetStore.setTemplate(widgets)
-  }
-  setTimeout(() => {
-    forceStore.setZoomScreenChange()
-  }, 300)
-  widgetStore.selectWidget({
-    uuid: '-1',
-  })
 }
 
 function setTempId(tempId: number | string) {
