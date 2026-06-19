@@ -22,6 +22,13 @@ export function setTemplate(store: TWidgetStore, allWidgets: TdWidgetData[]) {
   allWidgets.forEach((item, index) => {
     console.log(`setTemplate - 处理第 ${index} 个 widget:`, item)
     Number(item.uuid) < 0 && (item.uuid = nanoid()) // 重设id
+    // 修复 type 格式：将 "text"、"image"、"qrcode" 转换为 "w-text"、"w-image"、"w-qrcode"
+    if (item.type === 'text') item.type = 'w-text'
+    if (item.type === 'image') item.type = 'w-image'
+    if (item.type === 'qrcode') item.type = 'w-qrcode'
+    if (item.type === 'svg') item.type = 'w-svg'
+    if (item.type === 'group') item.type = 'w-group'
+    console.log(`setTemplate - widget ${index} 处理后:`, item)
     item.text && (item.text = decodeURIComponent(item.text))
     store.dWidgets.push(item)
   })
