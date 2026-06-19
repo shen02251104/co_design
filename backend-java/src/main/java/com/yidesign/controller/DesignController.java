@@ -163,11 +163,19 @@ public class DesignController {
             @Parameter(description = "搜索关键词") @RequestParam(required = false) String search,
             @Parameter(description = "页码") @RequestParam(required = false, defaultValue = "1") Integer page,
             @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer pageSize,
-            @Parameter(description = "分类") @RequestParam(required = false, defaultValue = "0") Integer cate,
+            @Parameter(description = "分类，可以是数字或字符串如text/svg/png") @RequestParam(required = false) String cate,
             @Parameter(description = "类型：type=1为组件列表") @RequestParam(required = false) Integer type
     ) {
         try {
-            return Result.success(templateService.getTemplateList(search, page, pageSize, cate, type));
+            Integer cateInt = 0;
+            if (cate != null) {
+                try {
+                    cateInt = Integer.parseInt(cate);
+                } catch (NumberFormatException e) {
+                    // cate是字符串类型如text/svg/png，保持cateInt=0
+                }
+            }
+            return Result.success(templateService.getTemplateList(search, page, pageSize, cateInt, type));
         } catch (Exception e) {
             return Result.error("获取模板失败: " + e.getMessage());
         }
