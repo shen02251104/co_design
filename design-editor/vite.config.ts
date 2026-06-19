@@ -63,9 +63,10 @@ export default defineConfig({
     port: 5173,  // 独立端口
     proxy: {
       // 代理到 Java 后端（端口 8080）
-      '^/design/(list|material|cate|temp|image|imgs|edit)': {
+      '/design': {
         target: 'http://localhost:8080/api',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/design/, '/design'),
       },
       '/api': {
         target: 'http://localhost:8080',
