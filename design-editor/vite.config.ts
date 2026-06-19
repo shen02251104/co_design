@@ -62,13 +62,13 @@ export default defineConfig({
     hmr: { overlay: false },
     port: 5173,  // 独立端口
     proxy: {
-      // 只代理 API 请求（design/list, design/material 等）
-      '^/design/(list|material|cate|temp|image|imgs)': {
-        target: 'http://localhost:5000/api',
+      // 代理到 Java 后端（端口 8080）
+      '^/design/(list|material|cate|temp|image|imgs|edit)': {
+        target: 'http://localhost:8080/api',
         changeOrigin: true,
       },
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8080',
         changeOrigin: true,
       },
     },
