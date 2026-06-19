@@ -1,6 +1,7 @@
 package com.yidesign.service;
 
 import com.yidesign.model.dto.TemplateDTO;
+import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -11,12 +12,12 @@ public interface TemplateService {
     /**
      * 获取模板列表
      */
-    TemplateDTO getTemplateList(String search, Integer page, Integer pageSize, Integer cate);
+    Map<String, Object> getTemplateList(String search, Integer page, Integer pageSize, Integer cate);
     
     /**
      * 获取模板详情
      */
-    TemplateDTO getTemplateById(String id, Integer type);
+    Map<String, Object> getTemplateById(String id, Integer type);
     
     /**
      * 保存模板

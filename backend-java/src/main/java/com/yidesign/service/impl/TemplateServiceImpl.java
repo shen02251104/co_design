@@ -3,6 +3,7 @@ package com.yidesign.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.yidesign.mapper.DesignTemplateMapper;
 import com.yidesign.model.dto.TemplateDTO;
+import com.yidesign.model.dto.TemplateItemDTO;
 import com.yidesign.model.entity.DesignTemplate;
 import com.yidesign.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 模板服务实现
@@ -23,7 +25,7 @@ public class TemplateServiceImpl implements TemplateService {
     private DesignTemplateMapper templateMapper;
 
     @Override
-    public TemplateDTO getTemplateList(String search, Integer page, Integer pageSize, Integer cate) {
+    public Map<String, Object> getTemplateList(String search, Integer page, Integer pageSize, Integer cate) {
         QueryWrapper<DesignTemplate> wrapper = new QueryWrapper<>();
         if (cate != null && cate > 0) {
             wrapper.eq("category_id", cate);
@@ -39,20 +41,47 @@ public class TemplateServiceImpl implements TemplateService {
         
         List<DesignTemplate> templates = templateMapper.selectList(wrapper);
         
-        TemplateDTO dto = new TemplateDTO();
-        dto.setList(templates);
-        dto.setTotal(countTemplates(search, cate));
-        dto.setPage(page);
-        dto.setSize(pageSize);
-        return dto;
+        // 转换为前端期望的字段名格式
+        List<TemplateItemDTO> items = templates.stream().map(t -> {
+            TemplateItemDTO item = new TemplateItemDTO();
+            item.setId(t.getId());
+            item.setTitle(t.getName());
+            item.setCover(t.getPreviewUrl());
+            item.setWidth(t.getWidth());
+            item.setHeight(t.getHeight());
+            item.setState(t.getIsPublic() != null ? t.getIsPublic() : 1);
+            item.setThumb(t.getPreviewUrl());
+            item.setData(t.getTemplateData());
+            return item;
+        }).collect(Collectors.toList());
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", items);
+        result.put("total", countTemplates(search, cate));
+        return result;
     }
 
     @Override
-    public TemplateDTO getTemplateById(String id, Integer type) {
+    public Map<String, Object> getTemplateById(String id, Integer type) {
         DesignTemplate template = templateMapper.selectById(Long.parseLong(id));
-        TemplateDTO dto = new TemplateDTO();
-        dto.setTemplate(template);
-        return dto;
+        if (template == null) {
+            return null;
+        }
+        
+        // 转换为前端期望的字段名格式
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", template.getId());
+        result.put("title", template.getName());
+        result.put("cover", template.getPreviewUrl());
+        result.put("width", template.getWidth());
+        result.put("height", template.getHeight());
+        result.put("data", template.getTemplateData());
+        result.put("category", template.getCategoryId());
+        result.put("state", template.getIsPublic());
+        result.put("created_time", template.getCreatedAt());
+        result.put("updated_time", template.getUpdatedAt());
+        
+        return result;
     }
 
     @Override
