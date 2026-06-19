@@ -1,14 +1,16 @@
 // 数据库连接配置
 import mysql from 'mysql2/promise'
 
-// 从环境变量获取数据库配置
+// 从环境变量获取数据库配置（Nuxt 服务端可以直接访问 process.env）
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '3306'),
   database: process.env.DB_NAME || 'yi_design',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
+  password: process.env.DB_PASSWORD || '123456',
 }
+
+console.log('数据库配置:', dbConfig)
 
 // 创建连接池
 let pool: mysql.Pool | null = null
@@ -31,35 +33,31 @@ export async function query(sql: string, params?: any[]) {
   }
 }
 
-export async function getTemplates(search?: string, cate?: string, page: number = 1, pageSize: number = 20) {
-  let sql = 'SELECT id, name, type, cover_url, preview_url, width, height, template_data, is_public, created_at, updated_at FROM design_template WHERE is_public = 1'
-  const params: any[] = []
-  
-  if (search) {
-    sql += ' AND name LIKE ?'
-    params.push(`%${search}%`)
+// 获取模板列表
+export async function getTemplates(page: number = 1, pageSize: number = 20) {
+  try {
+    const offset = (page - 1) * pageSize
+    const results = await query(
+      'SELECT id, name, type, description, cover_url, preview_url, width, height FROM design_template LIMIT ? OFFSET ?',
+      [pageSize, offset]
+    )
+    return results
+  } catch (error) {
+    console.error('获取模板列表失败:', error)
+    return []
   }
-  
-  if (cate) {
-    sql += ' AND type = ?'
-    params.push(cate)
-  }
-  
-  sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?'
-  params.push(pageSize, (page - 1) * pageSize)
-  
-  return await query(sql, params)
 }
 
-export async function getTemplateById(id: string) {
-  const sql = 'SELECT id, name, type, cover_url, preview_url, width, height, template_data, is_public, created_at, updated_at FROM design_template WHERE id = ?'
-  const results = await query(sql, [id])
-  return results
-}
-
-export async function closePool() {
-  if (pool) {
-    await pool.end()
-    pool = null
+// 获取模板详情（包含 template_data）
+export async function getTemplateById(id: string | number) {
+  try {
+    const results = await query(
+      'SELECT id, name, type, template_data, width, height FROM design_template WHERE id = ?',
+      [id]
+    )
+    return (results as any[])[0] || null
+  } catch (error) {
+    console.error('获取模板详情失败:', error)
+    return null
   }
 }

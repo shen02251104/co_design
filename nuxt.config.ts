@@ -128,6 +128,15 @@ export default defineNuxtConfig({
     },
   }),
 
+  // Database configuration via runtimeConfig
+  runtimeConfig: {
+    dbHost: process.env.DB_HOST || 'localhost',
+    dbPort: process.env.DB_PORT || '3306',
+    dbName: process.env.DB_NAME || 'yi_design',
+    dbUser: process.env.DB_USER || 'root',
+    dbPassword: process.env.DB_PASSWORD || '',
+  },
+
   // Security headers (Content Security Policy)
   nitro: {
     routeRules: {
