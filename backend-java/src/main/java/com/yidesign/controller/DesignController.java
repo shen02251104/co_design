@@ -159,7 +159,7 @@ public class DesignController {
 
     @Operation(summary = "模板列表", description = "获取设计模板列表")
     @GetMapping("/design/list")
-    public Result<TemplateDTO> getTemplates(
+    public Result<Object> getTemplates(
             @Parameter(description = "搜索关键词") @RequestParam(required = false) String search,
             @Parameter(description = "页码") @RequestParam(required = false, defaultValue = "1") Integer page,
             @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer pageSize,
@@ -174,7 +174,7 @@ public class DesignController {
 
     @Operation(summary = "模板详情", description = "获取单个模板详细信息")
     @GetMapping("/design/temp")
-    public Result<TemplateDTO> getTemplateDetail(
+    public Result<Object> getTemplateDetail(
             @Parameter(description = "模板ID") @RequestParam String id,
             @Parameter(description = "模板类型") @RequestParam(required = false, defaultValue = "0") Integer type
     ) {
