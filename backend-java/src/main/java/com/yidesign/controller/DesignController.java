@@ -1,8 +1,11 @@
 package com.yidesign.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.yidesign.mapper.TemplateCategoryMapper;
 import com.yidesign.model.dto.ScreenshotDTO;
 import com.yidesign.model.dto.TemplateDTO;
 import com.yidesign.model.dto.UploadResultDTO;
+import com.yidesign.model.entity.TemplateCategory;
 import com.yidesign.service.ScreenshotService;
 import com.yidesign.service.TemplateService;
 import com.yidesign.service.FileService;
@@ -17,6 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * 设计控制器 - 替代原 Node.js Express 后端
@@ -44,6 +52,9 @@ public class DesignController {
 
     @Autowired
     private FileService fileService;
+    
+    @Autowired
+    private TemplateCategoryMapper templateCategoryMapper;
 
     /**
      * 截图接口 - 使用 Playwright Java 替代 Puppeteer
@@ -212,15 +223,27 @@ public class DesignController {
             @Parameter(description = "分类类型") @RequestParam(required = false, defaultValue = "1") Integer type
     ) {
         try {
-            // 返回分类列表
+            // 从数据库读取分类列表
+            QueryWrapper<TemplateCategory> wrapper = new QueryWrapper<>();
+            wrapper.eq("type", type);
+            wrapper.eq("status", 1);  // 只获取启用的分类
+            wrapper.orderByAsc("sort");
+            
+            List<TemplateCategory> categoryList = templateCategoryMapper.selectList(wrapper);
+            
+            // 转换为前端期望的格式
             List<Map<String, Object>> categories = new ArrayList<>();
-            categories.add(Map.of("id", 1, "name", "全部", "type", 1));
-            categories.add(Map.of("id", 2, "name", "手机海报", "type", 1));
-            categories.add(Map.of("id", 3, "name", "公众号封面", "type", 1));
-            categories.add(Map.of("id", 4, "name", "小红书", "type", 1));
-            categories.add(Map.of("id", 5, "name", "社群发圈", "type", 1));
-            categories.add(Map.of("id", 6, "name", "电商主图", "type", 1));
-            categories.add(Map.of("id", 7, "name", "长图海报", "type", 1));
+            // 添加"全部"选项
+            categories.add(Map.of("id", 0, "name", "全部", "type", type));
+            
+            for (TemplateCategory cat : categoryList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", cat.getId());
+                item.put("name", cat.getName());
+                item.put("type", cat.getType());
+                categories.add(item);
+            }
+            
             return Result.success(categories);
         } catch (Exception e) {
             return Result.error("获取分类失败: " + e.getMessage());
