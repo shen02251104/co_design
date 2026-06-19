@@ -27,11 +27,6 @@ public class TemplateCategory {
     private Integer type;
     
     /**
-     * 父分类ID
-     */
-    private Long parentId;
-    
-    /**
      * 排序
      */
     private Integer sort;
