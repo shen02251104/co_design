@@ -160,12 +160,13 @@ public class DesignController {
     @Operation(summary = "模板列表", description = "获取设计模板列表")
     @GetMapping("/design/list")
     public Result<TemplateDTO> getTemplates(
-            @Parameter(description = "分类") @RequestParam(required = false) String category,
+            @Parameter(description = "搜索关键词") @RequestParam(required = false) String search,
             @Parameter(description = "页码") @RequestParam(required = false, defaultValue = "1") Integer page,
-            @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer size
+            @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer pageSize,
+            @Parameter(description = "分类") @RequestParam(required = false, defaultValue = "0") Integer cate
     ) {
         try {
-            return Result.success(templateService.getTemplateList(category, page, size));
+            return Result.success(templateService.getTemplateList(search, page, pageSize, cate));
         } catch (Exception e) {
             return Result.error("获取模板失败: " + e.getMessage());
         }
@@ -187,10 +188,10 @@ public class DesignController {
     @Operation(summary = "素材列表", description = "获取设计素材")
     @GetMapping("/design/material")
     public Result<Object> getMaterials(
-            @Parameter(description = "素材类型") @RequestParam(required = false) String type
+            @Parameter(description = "素材类型") @RequestParam(required = false) String cate
     ) {
         try {
-            return Result.success(templateService.getMaterials(type));
+            return Result.success(templateService.getMaterials(cate));
         } catch (Exception e) {
             return Result.error("获取素材失败: " + e.getMessage());
         }
@@ -199,10 +200,12 @@ public class DesignController {
     @Operation(summary = "图片素材", description = "获取图片类素材")
     @GetMapping("/design/imgs")
     public Result<Object> getPhotos(
-            @Parameter(description = "搜索关键词") @RequestParam(required = false) String keyword
+            @Parameter(description = "分类") @RequestParam(required = false) String cate,
+            @Parameter(description = "页码") @RequestParam(required = false, defaultValue = "1") Integer page,
+            @Parameter(description = "每页数量") @RequestParam(required = false, defaultValue = "20") Integer pageSize
     ) {
         try {
-            return Result.success(templateService.getPhotos(keyword));
+            return Result.success(templateService.getPhotos(cate, page, pageSize));
         } catch (Exception e) {
             return Result.error("获取图片失败: " + e.getMessage());
         }

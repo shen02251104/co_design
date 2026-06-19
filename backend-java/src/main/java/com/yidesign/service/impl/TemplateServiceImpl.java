@@ -23,24 +23,27 @@ public class TemplateServiceImpl implements TemplateService {
     private DesignTemplateMapper templateMapper;
 
     @Override
-    public TemplateDTO getTemplateList(String category, Integer page, Integer size) {
+    public TemplateDTO getTemplateList(String search, Integer page, Integer pageSize, Integer cate) {
         QueryWrapper<DesignTemplate> wrapper = new QueryWrapper<>();
-        if (category != null && !category.isEmpty()) {
-            wrapper.eq("category", category);
+        if (cate != null && cate > 0) {
+            wrapper.eq("category_id", cate);
         }
-        wrapper.eq("status", 1);
-        wrapper.orderByDesc("create_time");
+        if (search != null && !search.isEmpty()) {
+            wrapper.like("name", search);
+        }
+        wrapper.eq("is_public", 1);
+        wrapper.orderByDesc("created_at");
         
-        int offset = (page - 1) * size;
-        wrapper.last("LIMIT " + offset + ", " + size);
+        int offset = (page - 1) * pageSize;
+        wrapper.last("LIMIT " + offset + ", " + pageSize);
         
         List<DesignTemplate> templates = templateMapper.selectList(wrapper);
         
         TemplateDTO dto = new TemplateDTO();
         dto.setList(templates);
-        dto.setTotal(countTemplates(category));
+        dto.setTotal(countTemplates(search, cate));
         dto.setPage(page);
-        dto.setSize(size);
+        dto.setSize(pageSize);
         return dto;
     }
 
@@ -78,7 +81,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public Object getMaterials(String type) {
+    public Object getMaterials(String cate) {
         // 返回素材数据，这里暂时返回空列表
         Map<String, Object> result = new HashMap<>();
         result.put("list", new ArrayList<>());
@@ -87,7 +90,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public Object getPhotos(String keyword) {
+    public Object getPhotos(String cate, Integer page, Integer pageSize) {
         // 返回图片素材，这里暂时返回空列表
         Map<String, Object> result = new HashMap<>();
         result.put("list", new ArrayList<>());
@@ -95,12 +98,15 @@ public class TemplateServiceImpl implements TemplateService {
         return result;
     }
 
-    private long countTemplates(String category) {
+    private long countTemplates(String search, Integer cate) {
         QueryWrapper<DesignTemplate> wrapper = new QueryWrapper<>();
-        if (category != null && !category.isEmpty()) {
-            wrapper.eq("category", category);
+        if (cate != null && cate > 0) {
+            wrapper.eq("category_id", cate);
         }
-        wrapper.eq("status", 1);
+        if (search != null && !search.isEmpty()) {
+            wrapper.like("name", search);
+        }
+        wrapper.eq("is_public", 1);
         return templateMapper.selectCount(wrapper);
     }
 }

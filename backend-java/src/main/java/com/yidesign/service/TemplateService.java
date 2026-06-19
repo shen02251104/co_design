@@ -11,7 +11,7 @@ public interface TemplateService {
     /**
      * 获取模板列表
      */
-    TemplateDTO getTemplateList(String category, Integer page, Integer size);
+    TemplateDTO getTemplateList(String search, Integer page, Integer pageSize, Integer cate);
     
     /**
      * 获取模板详情
@@ -26,7 +26,13 @@ public interface TemplateService {
     /**
      * 获取素材列表
      */
-    Object getMaterials(String type);
+    Object getMaterials(String cate);
+    
+    /**
+     * 获取图片素材
+     */
+    Object getPhotos(String cate, Integer page, Integer pageSize);
+}
     
     /**
      * 获取图片素材
