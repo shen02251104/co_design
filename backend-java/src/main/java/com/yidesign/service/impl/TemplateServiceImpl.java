@@ -3,9 +3,11 @@ package com.yidesign.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yidesign.mapper.DesignTemplateMapper;
+import com.yidesign.mapper.MaterialMapper;
 import com.yidesign.model.dto.TemplateDTO;
 import com.yidesign.model.dto.TemplateItemDTO;
 import com.yidesign.model.entity.DesignTemplate;
+import com.yidesign.model.entity.Material;
 import com.yidesign.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,9 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Autowired
     private DesignTemplateMapper templateMapper;
+
+    @Autowired
+    private MaterialMapper materialMapper;
 
     @Override
     public Map<String, Object> getTemplateList(String search, Integer page, Integer pageSize, Integer cate, Integer type) {
@@ -124,10 +129,28 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public Object getMaterials(String cate) {
-        // 返回素材数据，这里暂时返回空列表
+        // 查询素材数据库
+        QueryWrapper<Material> wrapper = new QueryWrapper<>();
+        if (cate != null && !cate.isEmpty()) {
+            wrapper.eq("type", cate);
+        }
+        List<Material> materials = materialMapper.selectList(wrapper);
+        
+        // 转换为前端期望的格式
+        List<Map<String, Object>> list = materials.stream().map(m -> {
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", m.getId());
+            item.put("url", m.getUrl());
+            item.put("thumb", m.getThumbnailUrl());
+            item.put("width", m.getWidth());
+            item.put("height", m.getHeight());
+            item.put("title", m.getName());
+            return item;
+        }).collect(Collectors.toList());
+        
         Map<String, Object> result = new HashMap<>();
-        result.put("list", new ArrayList<>());
-        result.put("total", 0);
+        result.put("list", list);
+        result.put("total", materials.size());
         return result;
     }
 
