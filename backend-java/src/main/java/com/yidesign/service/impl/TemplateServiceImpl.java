@@ -181,7 +181,7 @@ public class TemplateServiceImpl implements TemplateService {
      * 返回模拟的组件数据（文字模板、组合模板等）
      * type=1 表示组件列表
      */
-    private Object getMockComponentList(String cate) {
+    private Map<String, Object> getMockComponentList(String cate) {
         List<Map<String, Object>> list = new ArrayList<>();
         
         // 根据分类返回不同的组件
