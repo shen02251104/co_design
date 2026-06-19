@@ -37,6 +37,7 @@ public class TemplateServiceImpl implements TemplateService {
         
         // type=1 为组件列表，返回模拟数据（文字模板等）
         if (type != null && type == 1) {
+            String cateStr = (cate != null) ? String.valueOf(cate) : "";
             return getMockComponentList(cateStr);
         } else {
             // 模板列表（type=0 或 null）
