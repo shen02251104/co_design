@@ -1,6 +1,7 @@
 package com.yidesign.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yidesign.mapper.DesignTemplateMapper;
 import com.yidesign.model.dto.TemplateDTO;
 import com.yidesign.model.dto.TemplateItemDTO;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +77,20 @@ public class TemplateServiceImpl implements TemplateService {
         result.put("cover", template.getPreviewUrl());
         result.put("width", template.getWidth());
         result.put("height", template.getHeight());
-        result.put("data", template.getTemplateData());
+        
+        // 将 template_data JSON字符串解析为对象数组，前端期望 [{global, layers}] 格式
+        try {
+            if (template.getTemplateData() != null && !template.getTemplateData().isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                Object dataObj = mapper.readValue(template.getTemplateData(), Object.class);
+                result.put("data", dataObj);
+            } else {
+                result.put("data", new ArrayList<>());
+            }
+        } catch (Exception e) {
+            result.put("data", new ArrayList<>());
+        }
+        
         result.put("category", template.getCategoryId());
         result.put("state", template.getIsPublic());
         result.put("created_time", template.getCreatedAt());
