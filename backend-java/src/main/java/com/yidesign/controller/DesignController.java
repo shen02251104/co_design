@@ -198,6 +198,27 @@ public class DesignController {
         }
     }
 
+    @Operation(summary = "模板分类", description = "获取模板分类列表")
+    @GetMapping("/design/cate")
+    public Result<Object> getCategories(
+            @Parameter(description = "分类类型") @RequestParam(required = false, defaultValue = "1") Integer type
+    ) {
+        try {
+            // 返回分类列表
+            List<Map<String, Object>> categories = new ArrayList<>();
+            categories.add(Map.of("id", 1, "name", "全部", "type", 1));
+            categories.add(Map.of("id", 2, "name", "手机海报", "type", 1));
+            categories.add(Map.of("id", 3, "name", "公众号封面", "type", 1));
+            categories.add(Map.of("id", 4, "name", "小红书", "type", 1));
+            categories.add(Map.of("id", 5, "name", "社群发圈", "type", 1));
+            categories.add(Map.of("id", 6, "name", "电商主图", "type", 1));
+            categories.add(Map.of("id", 7, "name", "长图海报", "type", 1));
+            return Result.success(categories);
+        } catch (Exception e) {
+            return Result.error("获取分类失败: " + e.getMessage());
+        }
+    }
+
     @Operation(summary = "图片素材", description = "获取图片类素材")
     @GetMapping("/design/imgs")
     public Result<Object> getPhotos(
