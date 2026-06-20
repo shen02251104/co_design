@@ -20,11 +20,17 @@
     <watermark-option style="margin-right: 0.5rem" />
     <!-- <copyRight> -->
     <slot />
-    <!-- <el-button :loading="state.loading" size="large" class="primary-btn" :disabled="tempEditing" plain type="primary" @click="download">下载作品</el-button> -->
+    <el-button type="primary" class="download-btn" :disabled="tempEditing" @click="showDownloadDialog">下载模版</el-button>
     <!-- </copyRight> -->
   </div>
   <!-- 生成图片组件 -->
   <SaveImage ref="canvasImage" />
+  <!-- 下载弹窗 -->
+  <DownloadDialog 
+    v-model="state.showDownloadDialog" 
+    :title="state.title"
+    @download="handleDownloadWithOptions"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -41,6 +47,7 @@ import downloadBlob from '@/common/methods/download/downloadBlob'
 import { useControlStore, useHistoryStore, useCanvasStore, useUserStore, useWidgetStore } from '@/store/index'
 import { storeToRefs } from 'pinia'
 import watermarkOption from './Watermark.vue'
+import DownloadDialog from './DownloadDialog.vue'
 
 type TProps = {
   modelValue?: boolean
@@ -56,6 +63,14 @@ type TState = {
   wmBollean: boolean
   title: string
   loading: boolean
+  showDownloadDialog: boolean
+}
+
+type TDownloadOptions = {
+  format: string
+  quality: string
+  size: string
+  usageType: string
 }
 
 const props = defineProps<TProps>()
@@ -85,7 +100,32 @@ const state = reactive<TState>({
   wmBollean: false,
   title: '',
   loading: false,
+  showDownloadDialog: false,
 })
+
+// 显示下载弹窗
+function showDownloadDialog() {
+  state.showDownloadDialog = true
+}
+
+// 处理下载选项
+async function handleDownloadWithOptions(options: TDownloadOptions) {
+  console.log('下载选项:', options)
+  
+  // 根据选项设置水印
+  const useWatermark = options.usageType === 'personal'
+  
+  // 根据尺寸设置缩放比例
+  let scale = 1
+  if (options.quality === 'high') scale = 2
+  if (options.quality === 'standard') scale = 1
+  
+  // 根据格式设置文件扩展名
+  const ext = options.format
+  
+  // 执行下载
+  await downloadWithOptions(useWatermark, scale, ext)
+}
 
 // 保存作品
 async function save(hasCover: boolean = false) {
@@ -196,6 +236,36 @@ async function download() {
 }
 function RandomNumber(min: number, max: number) {
   return Math.ceil(Math.random() * (max - min)) + min
+}
+
+// 带选项的下载
+async function downloadWithOptions(useWatermark: boolean, scale: number, ext: string) {
+  if (state.loading === true) {
+    useNotification('作品导出中', '当前有作品正在导出，请稍候再试')
+    return
+  }
+  state.loading = true
+  emit('update:modelValue', true)
+  emit('change', { downloadPercent: 1, downloadText: '正在生成图片...' })
+  
+  const currentRecord = pageStore.dCurrentPage
+  const fileName = `${state.title || '未命名作品'}.${ext}`
+  
+  try {
+    // 从前端出图
+    const { blob } = await canvasImage.value?.createPoster({ scale })
+    
+    // 如果需要添加水印且是个人使用，可以在这里处理
+    // 暂时直接下载
+    downloadBlob(blob, fileName)
+    
+    emit('change', { downloadPercent: 100, downloadText: '作品下载成功' })
+    useNotification('下载成功', `作品已保存为 ${fileName}`)
+  } catch (error) {
+    useNotification('下载失败', '请稍后重试', { type: 'error' })
+  } finally {
+    state.loading = false
+  }
 }
 
 async function load(cb: () => void) {
