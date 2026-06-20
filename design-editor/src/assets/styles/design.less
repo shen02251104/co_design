@@ -84,6 +84,45 @@
         transform: scale(0.95);
         margin-left: 10px;
       }
+      
+      // VIP开通按钮样式
+      .vip-button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: #7c3aed;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+        position: relative;
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(246, 211, 97, 0.4);
+        }
+        
+        svg {
+          color: #f59e0b;
+        }
+        
+        .vip-tag {
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          background: #ef4444;
+          color: #fff;
+          font-size: 10px;
+          padding: 2px 6px;
+          border-radius: 4px;
+          white-space: nowrap;
+        }
+      }
     }
   }
   .page-design-index-wrap {

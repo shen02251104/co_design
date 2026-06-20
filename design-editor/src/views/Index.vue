@@ -25,11 +25,38 @@
           <el-divider direction="vertical" />
         </div>
         <HeaderOptions ref="optionsRef" v-model="state.isContinue" @change="optionsChange">
+          <!-- VIP开通按钮 -->
+          <div 
+            ref="vipButtonRef"
+            class="vip-button"
+            @mouseenter="showVipPopover"
+            @mouseleave="hideVipPopover"
+            @click="openVipDialog"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+            <span>开通会员</span>
+            <span class="vip-tag">立减20</span>
+          </div>
           <!-- <el-button size="large" class="primary-btn" @click="dealWith('save')">{{ $t('header.save') }}</el-button> -->
           <el-button ref="ref4" size="large" class="primary-btn" type="primary" @click="optionsRef?.showDownloadDialog()">{{ $t('header.download') }}</el-button>
         </HeaderOptions>
       </div>
     </div>
+    
+    <!-- VIP权益悬浮提示 -->
+    <VipPopover 
+      v-model:visible="state.showVipPopover"
+      :targetEl="vipButtonRef"
+      @click="openVipDialog"
+    />
+    
+    <!-- VIP购买弹窗 -->
+    <VipPurchaseDialog 
+      v-model:visible="state.showVipDialog"
+      @purchase="handleVipPurchase"
+    />
     <div class="page-design-index-wrap">
       <widget-panel ref="ref2"></widget-panel>
       <design-board class="page-design-wrap" pageDesignCanvasId="page-design-canvas">
@@ -90,6 +117,8 @@ import Tour from './components/Tour.vue'
 import createDesign from '@/components/business/create-design'
 import multipleBoards from '@/components/modules/layout/multipleBoards'
 import useHistory from '@/common/hooks/history'
+import VipPopover from './components/VipPopover.vue'
+import VipPurchaseDialog from './components/VipPurchaseDialog.vue'
 useHistory()
 
 const ref1 = ref<ButtonInstance>()
@@ -105,6 +134,8 @@ type TState = {
   isContinue: boolean
   APP_NAME: string
   showLineGuides: boolean
+  showVipPopover: boolean
+  showVipDialog: boolean
 }
 
 // const {
@@ -128,11 +159,14 @@ const state = reactive<TState>({
   isContinue: true,
   APP_NAME: _config.APP_NAME,
   showLineGuides: false,
+  showVipPopover: false,
+  showVipDialog: false,
 })
 const optionsRef = ref<typeof HeaderOptions | null>(null)
 const zoomControlRef = ref<typeof zoomControl | null>(null)
 const controlStore = useControlStore()
 const createDesignRef: Ref<typeof createDesign | null> = ref(null)
+const vipButtonRef = ref<HTMLElement | null>(null)
 
 const beforeUnload = function (e: Event): any {
   if (dHistoryStack.value.changes.length > 0) {
@@ -253,6 +287,34 @@ const fns: any = {
 }
 const dealWith = (fnName: string, params?: any) => {
   fns[fnName](params)
+}
+
+// VIP相关方法
+let popoverTimer: number | null = null
+
+const showVipPopover = () => {
+  popoverTimer = setTimeout(() => {
+    state.showVipPopover = true
+  }, 200)
+}
+
+const hideVipPopover = () => {
+  if (popoverTimer) {
+    clearTimeout(popoverTimer)
+    popoverTimer = null
+  }
+  state.showVipPopover = false
+}
+
+const openVipDialog = () => {
+  hideVipPopover()
+  state.showVipDialog = true
+}
+
+const handleVipPurchase = (data: { package: string; method: string }) => {
+  console.log('VIP购买:', data)
+  // 这里可以调用后端API进行支付流程
+  state.showVipDialog = false
 }
 
 defineExpose({
