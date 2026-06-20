@@ -156,7 +156,7 @@ const handleDownload = () => {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 9999998;
+  z-index: 2147483646 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,7 +168,7 @@ const handleDownload = () => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 9999999;
+  z-index: 2147483647 !important;
   width: 400px;
   background: #fff;
   border-radius: 8px;
