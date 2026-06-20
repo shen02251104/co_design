@@ -141,7 +141,50 @@
             <div class="benefits-grid">
               <div v-for="benefit in benefits" :key="benefit.id" class="benefit-card">
                 <div class="benefit-icon">
-                  <component :is="benefit.icon" />
+                  <!-- Shield icon -->
+                  <svg v-if="benefit.iconType === 'shield'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                  </svg>
+                  <!-- Canvas icon -->
+                  <svg v-else-if="benefit.iconType === 'canvas'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="9" y1="3" x2="9" y2="21"/>
+                  </svg>
+                  <!-- Points icon -->
+                  <svg v-else-if="benefit.iconType === 'points'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                  </svg>
+                  <!-- Download icon -->
+                  <svg v-else-if="benefit.iconType === 'download'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  <!-- Template icon -->
+                  <svg v-else-if="benefit.iconType === 'template'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                  <!-- AI icon -->
+                  <svg v-else-if="benefit.iconType === 'ai'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <path d="M12 2a10 10 0 1 0 10 10"/>
+                    <path d="M12 2a7 7 0 1 0 7 7"/>
+                    <path d="M12 2a4 4 0 1 0 4 4"/>
+                  </svg>
+                  <!-- Cutout icon -->
+                  <svg v-else-if="benefit.iconType === 'cutout'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                  <!-- Batch icon -->
+                  <svg v-else-if="benefit.iconType === 'batch'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                  </svg>
                 </div>
                 <div class="benefit-name">{{ benefit.name }}</div>
                 <div class="benefit-desc">{{ benefit.desc }}</div>
@@ -238,7 +281,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, h } from 'vue'
+import { ref, computed } from 'vue'
 
 type TProps = {
   visible: boolean
@@ -321,83 +364,55 @@ const currentPackage = computed(() => {
   return packages.find(pkg => pkg.id === selectedPackage.value)
 })
 
-// 权益列表
+// 权益列表 - 使用字符串标识，在模板中渲染SVG
 const benefits = [
   {
     id: 1,
     name: '个人商用授权*1',
     desc: '仅支持个体商用授权',
-    icon: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', stroke-width: 2, width: 24, height: 24 }, [
-      h('path', { d: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' }),
-      h('path', { d: 'M9 12l2 2 4-4' })
-    ])
+    iconType: 'shield'
   },
   {
     id: 2,
     name: '无限画布',
     desc: 'AI设计助理，智能搞定一切',
-    icon: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', stroke-width: 2, width: 24, height: 24 }, [
-      h('rect', { x: 3, y: 3, width: 18, height: 18, rx: 2, ry: 2 }),
-      h('line', { x1: 9, y1: 3, x2: 9, y2: 21 })
-    ])
+    iconType: 'canvas'
   },
   {
     id: 3,
     name: '送600积分',
     desc: '赋能AI创作，灵感不息',
-    icon: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', stroke-width: 2, width: 24, height: 24 }, [
-      h('circle', { cx: 12, cy: 12, r: 10 }),
-      h('path', { d: 'M12 6v6l4 2' })
-    ])
+    iconType: 'points'
   },
   {
     id: 4,
     name: '无水印高清下载',
     desc: '所有作品可无水印下载',
-    icon: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', stroke-width: 2, width: 24, height: 24 }, [
-      h('path', { d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' }),
-      h('polyline', { points: '7 10 12 15 17 10' }),
-      h('line', { x1: 12, y1: 15, x2: 12, y2: 3 })
-    ])
+    iconType: 'download'
   },
   {
     id: 5,
     name: '100万+设计模板',
     desc: '每日更新，轻松完成设计',
-    icon: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', stroke-width: 2, width: 24, height: 24 }, [
-      h('path', { d: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z' }),
-      h('polyline', { points: '22,6 12,13 2,6' })
-    ])
+    iconType: 'template'
   },
   {
     id: 6,
     name: 'AI生图&视频模型',
     desc: '主流AI模型持续更新',
-    icon: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', stroke-width: 2, width: 24, height: 24 }, [
-      h('path', { d: 'M12 2a10 10 0 1 0 10 10' }),
-      h('path', { d: 'M12 2a7 7 0 1 0 7 7' }),
-      h('path', { d: 'M12 2a4 4 0 1 0 4 4' })
-    ])
+    iconType: 'ai'
   },
   {
     id: 7,
     name: '智能抠图',
     desc: '一键抠图，精准高效',
-    icon: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', stroke-width: 2, width: 24, height: 24 }, [
-      h('circle', { cx: 11, cy: 11, r: 8 }),
-      h('line', { x1: 21, y1: 21, x2: 16.65, y2: 16.65 })
-    ])
+    iconType: 'cutout'
   },
   {
     id: 8,
     name: '批量设计',
     desc: '一键生成多尺寸设计',
-    icon: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', stroke-width: 2, width: 24, height: 24 }, [
-      h('rect', { x: 3, y: 3, width: 7, height: 7 }),
-      h('rect', { x: 14, y: 3, width: 7, height: 7 }),
-      h('rect', { x: 14, y: 14, width: 7, height: 7 }),
-      h('rect', { x: 3, y: 14, width: 7, height: 7 })
-    ])
+    iconType: 'batch'
   }
 ]
 
