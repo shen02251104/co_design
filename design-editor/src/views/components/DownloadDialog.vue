@@ -1,115 +1,111 @@
 <!--
  * @Author: YiDesign
  * @Date: 2024-12-20
- * @Description: 下载作品弹窗组件
+ * @Description: 下载作品弹窗组件 - 使用固定定位悬浮方式
 -->
 <template>
-  <el-dialog
-    v-model="visible"
-    title="导出作品"
-    width="400px"
-    :close-on-click-modal="false"
-    :z-index="9999"
-    class="download-dialog"
-  >
-    <div class="download-content">
-      <!-- 文件信息 -->
-      <div class="section">
-        <div class="section-title">文件信息</div>
-        <div class="options-row">
-          <div class="option-group">
-            <label>格式</label>
-            <el-select v-model="downloadOptions.format" size="small">
-              <el-option label="PNG" value="png" />
-              <el-option label="JPG" value="jpg" />
-              <el-option label="PDF" value="pdf" />
-            </el-select>
+  <!-- 使用固定定位的悬浮弹窗 -->
+  <div v-if="visible" class="download-overlay" @click.self="closeDialog">
+    <div class="download-dialog-fixed">
+      <div class="dialog-header">
+        <span class="dialog-title">导出作品</span>
+        <span class="dialog-close" @click="closeDialog">×</span>
+      </div>
+      
+      <div class="dialog-body">
+        <!-- 文件信息 -->
+        <div class="section">
+          <div class="section-title">文件信息</div>
+          <div class="options-row">
+            <div class="option-group">
+              <label>格式</label>
+              <select v-model="downloadOptions.format" class="custom-select">
+                <option value="png">PNG</option>
+                <option value="jpg">JPG</option>
+                <option value="pdf">PDF</option>
+              </select>
+            </div>
+            <div class="option-group">
+              <label>清晰度</label>
+              <select v-model="downloadOptions.quality" class="custom-select">
+                <option value="original">原图</option>
+                <option value="high">高清(2x)</option>
+                <option value="standard">标准(1x)</option>
+              </select>
+            </div>
           </div>
-          <div class="option-group">
-            <label>清晰度</label>
-            <el-select v-model="downloadOptions.quality" size="small">
-              <el-option label="原图" value="original" />
-              <el-option label="高清(2x)" value="high" />
-              <el-option label="标准(1x)" value="standard" />
-            </el-select>
-          </div>
-          <div class="option-group">
-            <label>尺寸</label>
-            <el-select v-model="downloadOptions.size" size="small">
-              <el-option label="原图" value="original" />
-              <el-option label="微信封面(900x383)" value="wechat" />
-              <el-option label="手机海报(750x1000)" value="mobile" />
-              <el-option label="小红书(1080x1080)" value="xiaohongshu" />
-            </el-select>
+          <div class="options-row">
+            <div class="option-group">
+              <label>尺寸</label>
+              <select v-model="downloadOptions.size" class="custom-select">
+                <option value="original">原图 ({{ dPage?.width || 750 }}×{{ dPage?.height || 1000 }})</option>
+                <option value="wechat">微信封面 (900×383)</option>
+                <option value="phone">手机海报 (750×1000)</option>
+                <option value="xiaohongshu">小红书 (1080×1440)</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 使用类型 -->
-      <div class="section">
-        <div class="section-title">使用类型</div>
-        <el-radio-group v-model="downloadOptions.usageType" class="usage-radio-group">
-          <el-radio value="personal">
-            <div class="radio-content">
-              <span class="radio-title">个人交流学习/公益使用</span>
-              <span class="radio-desc" v-if="downloadOptions.usageType === 'personal'">不可用于任何商业用途，下载作品含水印</span>
+        <!-- 使用类型 -->
+        <div class="section">
+          <div class="section-title">使用类型</div>
+          <div class="use-type-options">
+            <div 
+              class="use-type-option" 
+              :class="{ active: downloadOptions.useType === 'personal' }"
+              @click="downloadOptions.useType = 'personal'"
+            >
+              <div class="option-header">
+                <span class="radio-dot"></span>
+                <span class="option-label">个人交流学习/公益使用</span>
+              </div>
+              <div class="option-desc">含水印，不可用于任何商业用途</div>
             </div>
-          </el-radio>
-          <el-radio value="commercial">
-            <div class="radio-content">
-              <span class="radio-title">商用授权</span>
-              <span class="radio-desc" v-if="downloadOptions.usageType === 'commercial'">可用于商业用途，无水印高清下载</span>
+            <div 
+              class="use-type-option" 
+              :class="{ active: downloadOptions.useType === 'commercial' }"
+              @click="downloadOptions.useType = 'commercial'"
+            >
+              <div class="option-header">
+                <span class="radio-dot"></span>
+                <span class="option-label">商用授权</span>
+              </div>
+              <div class="option-desc">无水印，可用于商业用途</div>
             </div>
-          </el-radio>
-        </el-radio-group>
-      </div>
-
-      <!-- 水印选项 -->
-      <div class="section" v-if="downloadOptions.usageType === 'personal'">
-        <div class="watermark-tip">
-          <el-icon><Warning /></el-icon>
-          <span>个人使用版本将添加"易设计"水印</span>
+          </div>
         </div>
-      </div>
 
-      <!-- 会员提示 -->
-      <div class="vip-section" v-if="downloadOptions.usageType === 'personal'">
+        <!-- 会员提示 -->
         <div class="vip-tip">
-          <span class="vip-icon">💎</span>
-          <span>开通会员，解锁无水印下载及更多权益</span>
+          <div class="vip-text">
+            <svg class="vip-icon" viewBox="0 0 24 24" width="16" height="16">
+              <path fill="currentColor" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+            <span>开通会员解锁无水印下载</span>
+          </div>
+          <button class="vip-btn">开通会员</button>
         </div>
-        <el-button type="warning" size="small" class="vip-btn">立即开通</el-button>
-      </div>
 
-      <!-- 下载按钮 -->
-      <div class="download-actions">
-        <el-button 
-          type="primary" 
-          :loading="loading"
-          @click="handleDownload"
-          class="download-btn"
-        >
-          {{ downloadOptions.usageType === 'commercial' ? '无水印下载' : '带水印下载' }}
-        </el-button>
+        <!-- 下载按钮 -->
+        <div class="download-buttons">
+          <button class="download-btn primary" @click="handleDownload">
+            {{ downloadOptions.useType === 'personal' ? '带水印下载' : '无水印下载' }}
+          </button>
+        </div>
+
+        <!-- 协议提示 -->
         <div class="agreement-tip">
-          下载即视为您已阅读并同意<a href="#" @click.prevent="showAgreement">《会员授权许可协议》</a>
+          下载即视为您已阅读并同意《会员授权许可协议》
         </div>
       </div>
     </div>
-  </el-dialog>
+  </div>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { ElDialog, ElSelect, ElOption, ElButton, ElSwitch, ElRadioGroup, ElRadioButton, ElRadio, ElIcon, ElDivider } from 'element-plus'
-import { Warning } from '@element-plus/icons-vue'
-
-type TDownloadOptions = {
-  format: string
-  quality: string
-  size: string
-  usageType: string
-}
+import { useCanvasStore } from '@/store'
 
 const props = defineProps<{
   modelValue: boolean
@@ -118,181 +114,260 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
-  (e: 'download', options: TDownloadOptions): void
+  (e: 'download', options: any): void
 }>()
+
+const canvasStore = useCanvasStore()
+const dPage = computed(() => canvasStore.dPage)
 
 const visible = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val)
 })
 
-const loading = ref(false)
-
-const downloadOptions = ref<TDownloadOptions>({
+const downloadOptions = ref({
   format: 'png',
   quality: 'original',
   size: 'original',
-  usageType: 'personal'
+  useType: 'personal'
 })
 
-// 商用时自动去掉水印提示
-watch(() => downloadOptions.value.usageType, (val) => {
-  if (val === 'commercial') {
-    // 商用默认高清无水印
-    downloadOptions.value.quality = 'high'
-  }
-})
-
-async function handleDownload() {
-  loading.value = true
-  try {
-    emit('download', downloadOptions.value)
-    // 关闭弹窗
-    visible.value = false
-  } finally {
-    loading.value = false
-  }
+const closeDialog = () => {
+  emit('update:modelValue', false)
 }
 
-function showAgreement() {
-  // 显示协议弹窗，暂时用 alert
-  alert('会员授权许可协议：\n1. 个人使用版本仅供学习交流，不可商用\n2. 商用版本需开通会员\n3. 下载作品版权归原作者所有')
+const handleDownload = () => {
+  emit('download', {
+    ...downloadOptions.value,
+    scale: downloadOptions.value.quality === 'high' ? 2 : downloadOptions.value.quality === 'standard' ? 1 : 1,
+    watermark: downloadOptions.value.useType === 'personal'
+  })
+  closeDialog()
 }
 </script>
 
-<style lang="scss">
-/* 全局样式，确保弹窗在最上层 */
-.download-dialog .el-dialog {
-  z-index: 9999 !important;
-}
-.download-dialog .el-overlay {
-  z-index: 9998 !important;
-}
-</style>
-
 <style lang="scss" scoped>
-.download-dialog {
-  .download-content {
-    padding: 10px 0;
+/* 遮罩层 - 固定定位在最上层 */
+.download-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 弹窗 - 固定定位在遮罩层之上 */
+.download-dialog-fixed {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99999;
+  width: 400px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  background: #f5f7fa;
+}
+
+.dialog-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.dialog-close {
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: #333;
   }
+}
 
-  .section {
-    margin-bottom: 20px;
-    
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 12px;
-    }
-  }
+.dialog-body {
+  padding: 20px;
+}
 
-  .options-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+.section {
+  margin-bottom: 20px;
+}
 
-    .option-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+.section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 12px;
+}
 
-      label {
-        font-size: 12px;
-        color: #666;
-      }
+.options-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
 
-      .el-select {
-        width: 100px;
-      }
-    }
-  }
-
-  .usage-radio-group {
-    width: 100%;
-    
-    .el-radio {
-      width: 100%;
-      margin-bottom: 10px;
-      height: auto;
-      align-items: flex-start;
-
-      .radio-content {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-
-        .radio-title {
-          font-size: 13px;
-          color: #333;
-        }
-
-        .radio-desc {
-          font-size: 11px;
-          color: #999;
-        }
-      }
-    }
-  }
-
-  .watermark-tip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px;
-    background: #fff7e6;
-    border-radius: 4px;
+.option-group {
+  flex: 1;
+  
+  label {
+    display: block;
     font-size: 12px;
-    color: #fa8c16;
+    color: #666;
+    margin-bottom: 6px;
   }
+}
 
-  .vip-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
-    background: linear-gradient(135deg, #fff9e6, #ffe6cc);
-    border-radius: 6px;
-    margin-bottom: 16px;
-
-    .vip-tip {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: #d48806;
-
-      .vip-icon {
-        font-size: 16px;
-      }
-    }
-
-    .vip-btn {
-      background: linear-gradient(135deg, #ff9500, #ff6b00);
-      color: white;
-      border: none;
-    }
+.custom-select {
+  width: 100%;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  
+  &:focus {
+    outline: none;
+    border-color: #409eff;
   }
+}
 
-  .download-actions {
-    text-align: center;
+.use-type-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-    .download-btn {
-      width: 100%;
-      height: 40px;
-      font-size: 14px;
-    }
-
-    .agreement-tip {
-      margin-top: 10px;
-      font-size: 11px;
-      color: #999;
-
-      a {
-        color: #409eff;
-        text-decoration: none;
-      }
+.use-type-option {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    border-color: #409eff;
+  }
+  
+  &.active {
+    border-color: #409eff;
+    background: #f0f7ff;
+    
+    .radio-dot {
+      background: #409eff;
+      border-color: #409eff;
     }
   }
+}
+
+.option-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.radio-dot {
+  width: 14px;
+  height: 14px;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.option-label {
+  font-size: 14px;
+  color: #333;
+}
+
+.option-desc {
+  font-size: 12px;
+  color: #999;
+  padding-left: 22px;
+}
+
+.vip-tip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fff6e6 0%, #ffe4c4 100%);
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.vip-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #e6a23c;
+}
+
+.vip-icon {
+  color: #e6a23c;
+}
+
+.vip-btn {
+  padding: 6px 12px;
+  background: #e6a23c;
+  color: #fff;
+  font-size: 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    background: #d4942b;
+  }
+}
+
+.download-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.download-btn {
+  padding: 12px 48px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &.primary {
+    background: #409eff;
+    color: #fff;
+    
+    &:hover {
+      background: #66b1ff;
+    }
+  }
+}
+
+.agreement-tip {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
 }
 </style>
