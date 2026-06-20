@@ -245,23 +245,24 @@ async function downloadWithOptions(useWatermark: boolean, scale: number, ext: st
     return
   }
   state.loading = true
-  emit('update:modelValue', true)
-  emit('change', { downloadPercent: 1, downloadText: '正在生成图片...' })
+  useNotification('开始下载', '正在生成图片，请稍候...')
   
-  const currentRecord = pageStore.dCurrentPage
   const fileName = `${state.title || '未命名作品'}.${ext}`
   
   try {
-    // 从前端出图
+    // 从前端出图，支持自定义缩放
     const { blob } = await canvasImage.value?.createPoster({ scale })
     
-    // 如果需要添加水印且是个人使用，可以在这里处理
-    // 暂时直接下载
+    if (!blob) {
+      useNotification('下载失败', '无法生成图片，请稍后重试', { type: 'error' })
+      return
+    }
+    
     downloadBlob(blob, fileName)
     
-    emit('change', { downloadPercent: 100, downloadText: '作品下载成功' })
     useNotification('下载成功', `作品已保存为 ${fileName}`)
   } catch (error) {
+    console.error('下载错误:', error)
     useNotification('下载失败', '请稍后重试', { type: 'error' })
   } finally {
     state.loading = false

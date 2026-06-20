@@ -66,13 +66,14 @@ async function createCover(cb: any) {
   }, 10)
 }
 
-async function createPoster() {
+async function createPoster(options?: { scale?: number }) {
   await checkFonts() // 等待字体加载完成
   const fonts = document.fonts
+  const customScale = options?.scale || 1
   const opts = {
     backgroundColor: null, // 关闭背景以支持透明图片生成
     useCORS: true,
-    scale: 100 / dZoom.value, // * window.devicePixelRatio
+    scale: customScale * (100 / dZoom.value), // * window.devicePixelRatio
     onclone: (document: any) => fonts.forEach((font) => document.fonts.add(font)),
   }
   // const style = document.createElement('style')
