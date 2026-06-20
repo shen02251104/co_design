@@ -161,6 +161,12 @@ function showAgreement() {
 
 <style lang="scss" scoped>
 .download-dialog {
+  :deep(.el-dialog) {
+    z-index: 9999 !important;
+  }
+  :deep(.el-overlay) {
+    z-index: 9998 !important;
+  }
   .download-content {
     padding: 10px 0;
   }
