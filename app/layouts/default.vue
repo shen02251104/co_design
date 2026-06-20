@@ -1,14 +1,15 @@
 <template>
-  <div class="flex min-h-screen bg-gray-100">
+  <div class="flex min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
     <!-- 左侧导航栏 -->
-    <aside class="w-56 bg-white border-r border-gray-200 flex flex-col fixed h-full z-40">
+    <aside class="w-56 bg-white border-r border-gray-200 flex flex-col fixed h-full z-40 shadow-sm">
       <!-- Logo区域 -->
       <div class="p-4 border-b border-gray-200">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg gradient-purple flex items-center justify-center">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-md">
             <span class="text-white font-bold text-sm">易</span>
           </div>
-          <span class="font-semibold text-gray-900">易设计</span>
+          <!-- 渐变品牌名 -->
+          <span class="font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">易可图</span>
         </div>
       </div>
       
@@ -39,26 +40,37 @@
       <TopBanner />
       
       <!-- 头部功能区 -->
-      <header class="bg-white border-b border-gray-200 px-6 py-3">
+      <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-3 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
-            <span class="text-gray-500 text-sm">易设计 · 电商人都在用的智能设计平台</span>
+            <!-- Slogan -->
+            <span class="text-gray-900 text-sm font-medium">
+              <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">易可图</span>
+              <span class="text-gray-600 ml-1">电商人都在用的设计平台</span>
+            </span>
           </div>
-          <div class="flex items-center gap-4">
-            <button class="px-4 py-2 bg-orange-50 text-orange-600 rounded-lg font-medium hover:bg-orange-100 transition flex items-center gap-2">
+          <div class="flex items-center gap-3">
+            <!-- 推广返现 - 金色 -->
+            <button class="px-4 py-2 bg-gradient-to-r from-amber-100 to-yellow-50 text-amber-700 rounded-lg font-medium hover:from-amber-200 hover:to-yellow-100 transition flex items-center gap-2 border border-amber-200">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4z"/>
+                <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c1.1 0 2 .9 2 2s-.9 2-2 2h-2V4c0-1.1.9-2 2-2zM9 4c1.1 0 2 .9 2 2v2H9c-1.1 0-2-.9-2-2s.9-2 2-2zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>
               </svg>
               推广返现
             </button>
-            <button class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg font-medium hover:bg-blue-100 transition flex items-center gap-2">
-              <span class="bg-blue-500 text-white text-xs px-1.5 rounded">17</span>
+            <!-- 充值 -->
+            <button class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition flex items-center gap-2">
+              <span class="bg-blue-500 text-white text-xs px-1.5 rounded font-bold">17</span>
               充值
             </button>
-            <button class="px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition">
+            <!-- 升级会员 - 带钻石图标 -->
+            <button class="px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition flex items-center gap-2">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 3H5L2 9l10 12L22 9l-3-6zM9.62 8l1.5-3h1.76l1.5 3H9.62zM11 10v6.68L5.44 10H11zm2 0h5.56L13 16.68V10zm6.26-2h-2.65l-1.5-3h2.65l1.5 3zM6.24 5h2.65l-1.5 3H4.74l1.5-3z"/>
+              </svg>
               升级会员
             </button>
-            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300">
+            <!-- 用户头像 -->
+            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition">
               <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
