@@ -160,14 +160,18 @@ function showAgreement() {
 }
 </script>
 
+<style lang="scss">
+/* 全局样式，确保弹窗在最上层 */
+.download-dialog .el-dialog {
+  z-index: 9999 !important;
+}
+.download-dialog .el-overlay {
+  z-index: 9998 !important;
+}
+</style>
+
 <style lang="scss" scoped>
 .download-dialog {
-  :deep(.el-dialog) {
-    z-index: 9999 !important;
-  }
-  :deep(.el-overlay) {
-    z-index: 9998 !important;
-  }
   .download-content {
     padding: 10px 0;
   }
