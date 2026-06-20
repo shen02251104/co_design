@@ -9,6 +9,7 @@
     title="导出作品"
     width="400px"
     :close-on-click-modal="false"
+    :z-index="9999"
     class="download-dialog"
   >
     <div class="download-content">
