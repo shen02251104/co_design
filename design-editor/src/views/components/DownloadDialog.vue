@@ -4,9 +4,10 @@
  * @Description: 下载作品弹窗组件 - 使用固定定位悬浮方式
 -->
 <template>
-  <!-- 使用固定定位的悬浮弹窗 -->
-  <div v-if="visible" class="download-overlay" @click.self="closeDialog">
-    <div class="download-dialog-fixed">
+  <!-- 使用 Teleport 将弹窗渲染到 body 顶层，确保不被遮挡 -->
+  <Teleport to="body">
+    <div v-if="visible" class="download-overlay" @click.self="closeDialog">
+      <div class="download-dialog-fixed">
       <div class="dialog-header">
         <span class="dialog-title">导出作品</span>
         <span class="dialog-close" @click="closeDialog">×</span>
@@ -100,7 +101,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
