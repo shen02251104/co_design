@@ -26,7 +26,7 @@
         </div>
         <HeaderOptions ref="optionsRef" v-model="state.isContinue" @change="optionsChange">
           <!-- <el-button size="large" class="primary-btn" @click="dealWith('save')">{{ $t('header.save') }}</el-button> -->
-          <el-button ref="ref4" size="large" class="primary-btn" type="primary" @click="dealWith('download')">{{ $t('header.download') }}</el-button>
+          <el-button ref="ref4" size="large" class="primary-btn" type="primary" @click="optionsRef?.showDownloadDialog()">{{ $t('header.download') }}</el-button>
         </HeaderOptions>
       </div>
     </div>

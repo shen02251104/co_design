@@ -18,10 +18,8 @@
     </template>
     <el-button v-else style="margin-right: 1rem" @click="jump2Edit">修改模板</el-button>
     <watermark-option style="margin-right: 0.5rem" />
-    <!-- <copyRight> -->
+    <!-- 下载按钮通过slot传递，这里不再重复添加 -->
     <slot />
-    <el-button type="primary" class="download-btn" :disabled="tempEditing" @click="showDownloadDialog">下载模版</el-button>
-    <!-- </copyRight> -->
   </div>
   <!-- 生成图片组件 -->
   <SaveImage ref="canvasImage" />
