@@ -347,6 +347,7 @@ defineExpose({
   saveTemp,
   stateChange,
   load,
+  showDownloadDialog,
 })
 </script>
 
