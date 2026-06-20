@@ -100,6 +100,7 @@
 
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue'
+import { ElDialog, ElSelect, ElOption, ElButton, ElSwitch, ElRadioGroup, ElRadioButton } from 'element-plus'
 import { Warning } from '@element-plus/icons-vue'
 
 type TDownloadOptions = {
