@@ -38,3 +38,19 @@ file:
 playwright:
   headless: true
   timeout: 30000  # 30秒超时
+
+# 支付配置
+payment:
+  alipay:
+    app-id: ${ALIPAY_APP_ID:your_alipay_app_id}
+    private-key: ${ALIPAY_PRIVATE_KEY:your_private_key}
+    public-key: ${ALIPAY_PUBLIC_KEY:alipay_public_key}
+    gateway-url: https://openapi.alipay.com/gateway.do
+    notify-url: ${ALIPAY_NOTIFY_URL:http://your-domain/api/vip/notify/alipay}
+    return-url: ${ALIPAY_RETURN_URL:http://your-domain/vip/success}
+  
+  wechat:
+    app-id: ${WECHAT_APP_ID:your_wechat_app_id}
+    mch-id: ${WECHAT_MCH_ID:your_mch_id}
+    api-key: ${WECHAT_API_KEY:your_api_key}
+    notify-url: ${WECHAT_NOTIFY_URL:http://your-domain/api/vip/notify/wechat}

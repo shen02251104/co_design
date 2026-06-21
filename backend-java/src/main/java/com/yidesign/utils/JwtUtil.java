@@ -82,4 +82,11 @@ public class JwtUtil {
     public boolean validateToken(String token) {
         return parseToken(token) != null;
     }
+    
+    /**
+     * 从 Token 中获取用户ID (别名方法)
+     */
+    public Long getUserIdFromToken(String token) {
+        return getUserId(token);
+    }
 }
