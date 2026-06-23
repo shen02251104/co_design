@@ -63,7 +63,21 @@
             
             <!-- 动态渲染的设计元素 -->
             <div v-if="hasContent">
-              <!-- 这里后续会添加实际的编辑功能 -->
+              <!-- 文字元素 -->
+              <div
+                v-for="element in textElements"
+                :key="element.id"
+                class="absolute cursor-move select-none"
+                :style="{
+                  left: element.x + 'px',
+                  top: element.y + 'px',
+                  width: element.width + 'px',
+                  minHeight: element.height + 'px',
+                  ...element.style
+                }"
+              >
+                {{ element.content }}
+              </div>
             </div>
           </div>
         </div>
@@ -135,6 +149,11 @@
           </div>
         </div>
         
+        <!-- 文字设计面板 -->
+        <div v-else-if="activeMenuId === 'text-design'">
+          <TextDesignPanel @addText="handleAddText" />
+        </div>
+        
         <div v-else class="text-center py-8 text-gray-400">
           <p>请选择左侧功能</p>
         </div>
@@ -146,6 +165,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import TextDesignPanel from '~/components/TextDesignPanel.vue'
 
 const route = useRoute()
 const activeMenuId = ref('')
@@ -184,6 +204,24 @@ const canvasHeight = computed(() => {
 
 const handleMenuClick = (item: any) => {
   activeMenuId.value = item.id
+  hasContent.value = true
+}
+
+// 文字元素列表
+const textElements = ref<any[]>([])
+
+// 添加文字到画布
+const handleAddText = (textData: any) => {
+  const newElement = {
+    id: Date.now(),
+    content: textData.content,
+    style: textData.style,
+    x: (canvasWidth.value - 200) / 2,
+    y: (canvasHeight.value - 50) / 2,
+    width: 200,
+    height: 50,
+  }
+  textElements.value.push(newElement)
   hasContent.value = true
 }
 
