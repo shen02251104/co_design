@@ -17,26 +17,16 @@ export const SUPABASE_CONFIG_READY_EVENT = 'supabase-config-ready';
  * 获取 Supabase 配置
  */
 export const useSupabaseConfig = () => {
-  // 如果配置已经加载完成，直接返回
-  if (isReady.value && config.value) {
-    return {
-      config: readonly(config.value),
-      isLoading: false,
-      error: null,
-      isReady: true
-    };
-  }
-  
   // 异步加载配置
   const loadConfig = async () => {
     if (isReady.value) return;
     
     try {
       isLoading.value = true;
-      const response = await $fetch('/api/supabase-config');
+      const response = await $fetch<SupabaseConfig>('/api/supabase-config');
       
       if (response && response.url && response.anonKey) {
-        config.value = response as SupabaseConfig;
+        config.value = response;
         isReady.value = true;
         
         // 触发全局事件
@@ -55,8 +45,10 @@ export const useSupabaseConfig = () => {
     }
   };
   
-  // 开始加载
-  loadConfig();
+  // 开始加载（仅客户端）
+  if (typeof window !== 'undefined') {
+    loadConfig();
+  }
   
   return {
     config: readonly(config),

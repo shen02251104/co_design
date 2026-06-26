@@ -116,7 +116,7 @@
               />
               <button 
                 class="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-2.5 rounded-xl font-medium hover:from-purple-600 hover:to-blue-600 transition shadow-md"
-                @click="$refs.fileInput?.click()"
+                @click="triggerFileInput"
               >
                 选择图片
               </button>
@@ -622,6 +622,11 @@ const handleFileSelect = (e: Event) => {
   if (files && files.length > 0) {
     processFile(files[0])
   }
+}
+
+// 触发文件选择
+const triggerFileInput = () => {
+  fileInput.value?.click()
 }
 
 // 处理文件

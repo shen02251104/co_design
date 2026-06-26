@@ -124,7 +124,9 @@ async function updateUserMembership(client: ReturnType<typeof getServerSupabaseC
   if (vipLevel) {
     // 升级逻辑：终身 > 专业 > 基础 > 免费
     const levelOrder: Record<string, number> = { lifetime: 4, pro: 3, basic: 2, free: 1 };
-    if (levelOrder[vipLevel] > levelOrder[newVipLevel]) {
+    const currentLevel = levelOrder[newVipLevel] ?? 1;
+    const newLevel = levelOrder[vipLevel] ?? 1;
+    if (newLevel > currentLevel) {
       newVipLevel = vipLevel;
     }
   }

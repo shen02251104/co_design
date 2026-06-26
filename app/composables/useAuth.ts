@@ -4,11 +4,26 @@ import { useSupabaseClient } from './useSupabaseClient';
 import { useSupabaseConfig } from './useSupabaseConfig';
 import { navigateTo } from '#imports';
 
+// 会员信息类型
+interface MembershipInfo {
+  isVip: boolean;
+  vipLevel: string;
+  vipExpireTime: string | null;
+  aiCredits: number;
+  aiCreditsUsed: number;
+}
+
 // 全局状态
 const user = ref<User | null>(null);
 const session = ref<Session | null>(null);
 const isLoading = ref(true);
+const membership = ref<MembershipInfo | null>(null);
 const isAuthenticated = computed(() => !!session.value && !!user.value);
+
+// 别名，方便其他组件使用
+const isLoggedIn = computed(() => isAuthenticated.value);
+const isVip = computed(() => membership.value?.isVip ?? false);
+const aiCredits = computed(() => membership.value?.aiCredits ?? 0);
 
 /**
  * 用户认证状态管理 Composable
@@ -35,6 +50,8 @@ export const useAuth = () => {
       } else if (currentSession) {
         session.value = currentSession;
         user.value = currentSession.user;
+        // 获取会员信息
+        await refreshMembership();
       }
       
       // 监听认证状态变化
@@ -44,9 +61,11 @@ export const useAuth = () => {
         if (event === 'SIGNED_IN' && newSession) {
           session.value = newSession;
           user.value = newSession.user;
+          refreshMembership();
         } else if (event === 'SIGNED_OUT') {
           session.value = null;
           user.value = null;
+          membership.value = null;
         } else if (event === 'TOKEN_REFRESHED' && newSession) {
           session.value = newSession;
         }
@@ -55,6 +74,31 @@ export const useAuth = () => {
       console.error('Failed to init auth:', err);
     } finally {
       isLoading.value = false;
+    }
+  };
+  
+  /**
+   * 刷新会员信息
+   */
+  const refreshMembership = async () => {
+    if (!user.value || !session.value) {
+      membership.value = null;
+      return;
+    }
+    
+    try {
+      const response = await $fetch<{ success: boolean; data?: MembershipInfo }>('/api/user/membership', {
+        headers: {
+          'x-session': session.value.access_token
+        }
+      });
+      
+      if (response.success && response.data) {
+        membership.value = response.data;
+      }
+    } catch (err) {
+      console.error('Failed to get membership:', err);
+      membership.value = null;
     }
   };
   
@@ -76,6 +120,7 @@ export const useAuth = () => {
     if (data.session) {
       session.value = data.session;
       user.value = data.user;
+      await refreshMembership();
     }
     
     return data;
@@ -111,6 +156,13 @@ export const useAuth = () => {
   };
   
   /**
+   * 登出 (别名 signOut)
+   */
+  const logout = async () => {
+    return signOut();
+  };
+  
+  /**
    * 登出
    */
   const signOut = async () => {
@@ -125,6 +177,7 @@ export const useAuth = () => {
     // 清除状态
     session.value = null;
     user.value = null;
+    membership.value = null;
     
     // 跳转到登录页
     await navigateTo('/login');
@@ -134,29 +187,37 @@ export const useAuth = () => {
    * 获取用户会员状态
    */
   const getMembership = async () => {
-    if (!user.value) return null;
-    
-    const response = await $fetch('/api/user/membership', {
-      headers: {
-        'x-session': session.value?.access_token || ''
-      }
-    });
-    
-    return response;
+    await refreshMembership();
+    return membership.value;
   };
+  
+  /**
+   * 获取用户信息
+   */
+  const fetchUser = async () => {
+    if (!session.value) return null;
+    
+    await refreshMembership();
+    return {
+      user: user.value,
+      membership: membership.value
+    };
+  };
+  
+  // 用户头像首字母
+  const userInitial = computed(() => {
+    if (!user.value) return '';
+    const name = user.value.user_metadata?.full_name || user.value.email || '';
+    return name.charAt(0).toUpperCase();
+  });
   
   // 监听配置就绪后初始化
   if (typeof window !== 'undefined') {
-    watch(isReady, (ready) => {
+    watch(() => isReady.value, (ready) => {
       if (ready) {
         initAuth();
       }
-    });
-    
-    // 如果已经就绪，立即初始化
-    if (isReady.value) {
-      initAuth();
-    }
+    }, { immediate: true });
   }
   
   return {
@@ -164,10 +225,18 @@ export const useAuth = () => {
     session,
     isLoading,
     isAuthenticated,
+    isLoggedIn,
+    isVip,
+    membership,
+    aiCredits,
+    userInitial,
     initAuth,
     signInWithEmail,
     signUpWithEmail,
     signOut,
-    getMembership
+    logout,
+    getMembership,
+    fetchUser,
+    refreshMembership
   };
 };

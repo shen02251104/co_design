@@ -1,5 +1,3 @@
-import type { DefineAPI } from 'nuxt'
-
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const type = query.type || '1'

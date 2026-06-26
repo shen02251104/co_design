@@ -1,4 +1,4 @@
-import { OpenAI } from 'openAI'
+import { OpenAI } from 'openai'
 
 // AI设计流式生成API - 实时返回生成进度
 

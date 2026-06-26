@@ -79,7 +79,7 @@
               <span v-if="isVip" class="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-xs px-1.5 py-0.5 rounded font-bold">VIP</span>
               <!-- 用户头像 -->
               <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-                <span class="text-white text-sm font-medium">{{ userInitial }}</span>
+                <span class="text-white text-sm font-medium">{{ displayUserInitial }}</span>
               </div>
             </NuxtLink>
           </div>
@@ -105,14 +105,18 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
 
-const { user, isLoggedIn, isVip } = useAuth()
+const { user, isLoggedIn, isVip, aiCredits, userInitial } = useAuth()
 
-const userInitial = computed(() => {
+// Local userInitial fallback (in case useAuth doesn't provide it)
+const localUserInitial = computed(() => {
   if (user.value?.email) {
     return user.value.email.charAt(0).toUpperCase()
   }
   return 'U'
 })
+
+// Use either from useAuth or local
+const displayUserInitial = computed(() => userInitial?.value || localUserInitial.value)
 
 interface NavItem {
   id: string

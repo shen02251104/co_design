@@ -69,7 +69,7 @@ function alipaySign(params: Record<string, string>, privateKey: string): string 
 /**
  * 产品定价配置
  */
-const PRODUCT_PRICES: Record<string, { name: string; price: number; vipLevel?: string; durationDays?: number; aiCount?: number }> = {
+const PRODUCT_PRICES: Record<string, { name: string; price: number; vipLevel?: string; durationDays?: number | null; aiCount?: number }> = {
   'vip_basic_monthly': { name: '基础版月卡', price: 29.9, vipLevel: 'basic', durationDays: 30 },
   'vip_basic_yearly': { name: '基础版年卡', price: 199, vipLevel: 'basic', durationDays: 365 },
   'vip_pro_monthly': { name: '专业版月卡', price: 59.9, vipLevel: 'pro', durationDays: 30 },

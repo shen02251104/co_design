@@ -90,7 +90,7 @@ function getSupabaseClientSync(): SupabaseClient {
  * Supabase 客户端 Composable
  */
 export const useSupabaseClient = () => {
-  const client = ref<SupabaseClient | null>(null);
+  const client = ref<any>(null);
   const isLoading = ref(true);
   const error = ref<string | null>(null);
   
@@ -124,11 +124,11 @@ export const useSupabaseClient = () => {
     for (let i = 0; i < maxRetries; i++) {
       try {
         if (client.value) {
-          return client.value;
+          return client.value as SupabaseClient;
         }
         await initClient();
         if (client.value) {
-          return client.value;
+          return client.value as SupabaseClient;
         }
       } catch {
         if (i < maxRetries - 1) {
@@ -138,7 +138,7 @@ export const useSupabaseClient = () => {
     }
     
     if (client.value) {
-      return client.value;
+      return client.value as SupabaseClient;
     }
     
     throw new Error('Failed to get Supabase client after retries');

@@ -1,12 +1,27 @@
 <script setup lang="ts">
 import { useAuth } from '~/composables/useAuth'
 
-const { user, isAuthenticated, logout } = useAuth()
+interface MembershipData {
+  vipLevel: string;
+  vipStartDate: string | null;
+  vipEndDate: string | null;
+  aiUsageCount: number;
+  aiTotalCount: number;
+  aiExtraCount: number;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+const { user, isAuthenticated, signOut } = useAuth()
 const router = useRouter()
 const activeTab = ref('membership')
 
 // 会员状态数据
-const membershipInfo = ref({
+const membershipInfo = ref<MembershipData>({
   vipLevel: 'free',
   vipStartDate: null,
   vipEndDate: null,
@@ -16,7 +31,7 @@ const membershipInfo = ref({
 })
 
 // 订单记录
-const orderList = ref([])
+const orderList = ref<any[]>([])
 const loadingOrders = ref(false)
 
 // 个人资料
@@ -35,8 +50,8 @@ if (!isAuthenticated.value) {
 const fetchMembership = async () => {
   if (!user.value?.id) return
   try {
-    const res = await $fetch(`/api/user/membership?userId=${user.value.id}`)
-    if (res.success) {
+    const res = await $fetch<ApiResponse<MembershipData>>(`/api/user/membership?userId=${user.value.id}`)
+    if (res.success && res.data) {
       membershipInfo.value = res.data
     }
   } catch (error) {
@@ -49,8 +64,8 @@ const fetchOrders = async () => {
   if (!user.value?.id) return
   loadingOrders.value = true
   try {
-    const res = await $fetch(`/api/payment/orders?userId=${user.value.id}`)
-    if (res.success) {
+    const res = await $fetch<ApiResponse<any[]>>(`/api/payment/orders?userId=${user.value.id}`)
+    if (res.success && res.data) {
       orderList.value = res.data
     }
   } catch (error) {
@@ -62,12 +77,12 @@ const fetchOrders = async () => {
 // 更新个人资料
 const updateProfile = async () => {
   // TODO: 实现资料更新
-  ElMessage.success('资料更新成功')
+  alert('资料更新成功')
 }
 
 // 退出登录
 const handleLogout = async () => {
-  await logout()
+  await signOut()
   router.push('/')
 }
 

@@ -77,7 +77,7 @@
                   class="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                   @click="switchPaymentMethod('alipay')"
                 >
-                  <img src="/images/alipay-logo.png" alt="支付宝" class="w-5 h-5" onerror="this.style.display='none'" />
+                  <img src="/images/alipay-logo.svg" alt="支付宝" class="w-5 h-5" onerror="this.style.display='none'" />
                   支付宝
                 </button>
                 <button
@@ -85,7 +85,7 @@
                   class="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                   @click="switchPaymentMethod('wechat')"
                 >
-                  <img src="/images/wechat-logo.png" alt="微信" class="w-5 h-5" onerror="this.style.display='none'" />
+                  <img src="/images/wechat-logo.svg" alt="微信" class="w-5 h-5" onerror="this.style.display='none'" />
                   微信支付
                 </button>
               </div>
@@ -156,13 +156,36 @@ interface Emits {
   (e: 'success'): void;
 }
 
+// API Response Types
+interface CreateOrderResponse {
+  success: boolean;
+  orderNo?: string;
+  productName?: string;
+  amount?: number;
+  qrCodeUrl?: string;
+  error?: string;
+}
+
+interface QueryOrderResponse {
+  success: boolean;
+  status?: 'pending' | 'paid' | 'failed';
+  error?: string;
+}
+
+interface OrderInfo {
+  orderNo: string;
+  productName: string;
+  amount: number;
+  qrCodeUrl: string;
+}
+
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const paymentMethod = ref<'alipay' | 'wechat'>('alipay');
 const loading = ref(false);
 const error = ref('');
-const orderInfo = ref<any>(null);
+const orderInfo = ref<OrderInfo | null>(null);
 const paymentStatus = ref<'pending' | 'paid' | 'failed'>('pending');
 const pollTimer = ref<number | null>(null);
 
@@ -186,7 +209,7 @@ async function createOrder() {
   try {
     const userId = props.userId || 'guest_' + Date.now();
     
-    const response = await $fetch('/api/payment/create-order', {
+    const response = await $fetch<CreateOrderResponse>('/api/payment/create-order', {
       method: 'POST',
       body: {
         userId,
@@ -195,8 +218,13 @@ async function createOrder() {
       },
     });
 
-    if (response.success) {
-      orderInfo.value = response;
+    if (response.success && response.orderNo && response.productName && response.amount && response.qrCodeUrl) {
+      orderInfo.value = {
+        orderNo: response.orderNo,
+        productName: response.productName,
+        amount: response.amount,
+        qrCodeUrl: response.qrCodeUrl,
+      };
       // 开始轮询订单状态
       startPolling(response.orderNo);
     } else {
@@ -221,7 +249,7 @@ async function switchPaymentMethod(method: 'alipay' | 'wechat') {
 function startPolling(orderNo: string) {
   pollTimer.value = window.setInterval(async () => {
     try {
-      const response = await $fetch(`/api/payment/query-order?orderNo=${orderNo}`);
+      const response = await $fetch<QueryOrderResponse>(`/api/payment/query-order?orderNo=${orderNo}`);
       
       if (response.success && response.status === 'paid') {
         paymentStatus.value = 'paid';

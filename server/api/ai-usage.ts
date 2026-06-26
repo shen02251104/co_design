@@ -92,7 +92,7 @@ export default defineEventHandler(async (event: H3Event): Promise<AiUsageRespons
       
       const vipLevel = 'free';
       const used = 0;
-      const total = VIP_LIMITS[vipLevel];
+      const total = VIP_LIMITS[vipLevel] ?? VIP_LIMITS.free ?? 5;
       
       if (method === 'GET') {
         return {
@@ -109,7 +109,7 @@ export default defineEventHandler(async (event: H3Event): Promise<AiUsageRespons
     const vipLevel = membership?.vip_level || 'free';
     const used = membership?.ai_credits_used || 0;
     const extra = membership?.ai_extra_count || 0;
-    const total = VIP_LIMITS[vipLevel] + extra;
+    const total = (VIP_LIMITS[vipLevel] ?? VIP_LIMITS.free ?? 5) + extra;
     
     if (method === 'GET') {
       // 获取AI使用情况

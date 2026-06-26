@@ -3,7 +3,7 @@ import { getTemplateById } from '../../utils/db'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
-  const id = query.id || '1'
+  const id = String(query.id || '1')
   const type = query.type || null
 
   try {

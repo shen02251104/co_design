@@ -95,5 +95,7 @@ export default defineConfig([
     'app/utils/**',
     'app/types/**',
     'app/api/poster-api/**',
+    // Ignore 迅排设计 open source project (Vue2 legacy code)
+    'design-editor/**',
   ]),
 ]);

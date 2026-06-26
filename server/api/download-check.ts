@@ -48,6 +48,14 @@ const VIP_BENEFITS: Record<string, VipBenefits> = {
   }
 }
 
+// 默认权益
+const DEFAULT_BENEFITS: VipBenefits = {
+  watermark: true,
+  maxResolution: 800,
+  commercialUse: false,
+  downloadFormats: ['png']
+}
+
 // 模拟用户数据
 const mockUserData: Record<string, { vipLevel: string }> = {
   'default': { vipLevel: 'free' }
@@ -55,13 +63,13 @@ const mockUserData: Record<string, { vipLevel: string }> = {
 
 export default defineEventHandler(async (event: H3Event) => {
   const userId = getHeader(event, 'x-user-id') || 'default'
-  const userData = mockUserData[userId] || mockUserData['default']
+  const userData = mockUserData[userId] || { vipLevel: 'free' }
   
   try {
     const body = await readBody(event) as DownloadRequest
     const { requestedFormat, requestedResolution, commercialUse } = body
     
-    const benefits = VIP_BENEFITS[userData.vipLevel] || VIP_BENEFITS.free
+    const benefits: VipBenefits = VIP_BENEFITS[userData.vipLevel] ?? DEFAULT_BENEFITS
     
     // 检查水印权限
     if (body.noWatermark && benefits.watermark) {
