@@ -480,6 +480,7 @@
               <NuxtLink to="/membership-pricing" class="hover:text-gray-700 transition">价格方案</NuxtLink>
               <NuxtLink to="/help" class="hover:text-gray-700 transition">帮助中心</NuxtLink>
               <NuxtLink to="/contact" class="hover:text-gray-700 transition">联系我们</NuxtLink>
+              <NuxtLink to="/user-center" class="hover:text-gray-700 transition">用户中心</NuxtLink>
             </div>
           </div>
           <div class="flex items-center gap-4">
@@ -506,8 +507,8 @@
         <div class="border-t border-gray-200 mt-4 pt-4 flex items-center justify-between text-xs text-gray-400">
           <span>© 2024 易可图 版权所有</span>
           <div class="flex items-center gap-4">
-            <NuxtLink to="/privacy" class="hover:text-gray-600 transition">隐私政策</NuxtLink>
-            <NuxtLink to="/terms" class="hover:text-gray-600 transition">服务条款</NuxtLink>
+            <NuxtLink to="/user-agreement" class="hover:text-gray-600 transition">用户协议</NuxtLink>
+            <NuxtLink to="/privacy-policy" class="hover:text-gray-600 transition">隐私政策</NuxtLink>
             <span>ICP备案号：待完善</span>
           </div>
         </div>

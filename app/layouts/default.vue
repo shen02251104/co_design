@@ -87,6 +87,9 @@
     
     <!-- 右侧悬浮按钮 -->
     <FloatingButtons />
+    
+    <!-- 反馈按钮 -->
+    <FeedbackButton />
   </div>
 </template>
 
