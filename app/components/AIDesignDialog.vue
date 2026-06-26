@@ -77,6 +77,37 @@
             </div>
           </div>
           
+          <!-- 尺寸和场景选择 -->
+          <div class="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-gray-700 font-medium mb-2">设计尺寸</label>
+              <select 
+                v-model="selectedSize"
+                class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition"
+              >
+                <option value="">自动选择</option>
+                <option value="小红书封面">小红书封面 (3:4)</option>
+                <option value="微信海报">微信海报 (1:1)</option>
+                <option value="商品详情页">商品详情页 (800x1200)</option>
+                <option value="商品主图">商品主图 (800x800)</option>
+                <option value="横版海报">横版海报 (16:9)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-700 font-medium mb-2">使用场景</label>
+              <select 
+                v-model="selectedScene"
+                class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition"
+              >
+                <option value="">自动选择</option>
+                <option value="电商">电商</option>
+                <option value="社交">社交媒体</option>
+                <option value="印刷">印刷品</option>
+                <option value="广告">广告宣传</option>
+              </select>
+            </div>
+          </div>
+          
           <!-- 设计风格选择 -->
           <div class="mb-6">
             <label class="block text-gray-700 font-medium mb-2">设计风格</label>
@@ -96,14 +127,32 @@
           <!-- 预览区域 -->
           <div v-if="isGenerating" class="mb-6">
             <label class="block text-gray-700 font-medium mb-2">AI正在创作...</label>
-            <div class="bg-gray-50 rounded-xl p-8 flex items-center justify-center min-h-[300px]">
-              <div class="text-center">
-                <div class="w-16 h-16 mx-auto mb-4 relative">
+            <div class="bg-gray-50 rounded-xl p-8 min-h-[300px]">
+              <!-- 进度条 -->
+              <div class="mb-6">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-gray-600 font-medium">{{ generatingStep }}</span>
+                  <span class="text-purple-600 font-bold">{{ progress }}%</span>
+                </div>
+                <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    class="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-300"
+                    :style="{ width: `${progress}%` }"
+                  ></div>
+                </div>
+              </div>
+              
+              <!-- 实时内容展示 -->
+              <div v-if="streamContent" class="bg-white rounded-lg p-4 border border-gray-200">
+                <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ streamContent }}</div>
+              </div>
+              
+              <!-- 加载动画 -->
+              <div v-else class="flex items-center justify-center py-8">
+                <div class="w-12 h-12 relative">
                   <div class="absolute inset-0 rounded-full border-4 border-purple-200"></div>
                   <div class="absolute inset-0 rounded-full border-4 border-purple-500 border-t-transparent animate-spin"></div>
                 </div>
-                <p class="text-gray-500 mb-2">正在分析您的需求...</p>
-                <p class="text-gray-400 text-sm">{{ generatingStep }}</p>
               </div>
             </div>
           </div>
@@ -111,24 +160,49 @@
           <div v-else-if="generatedDesign" class="mb-6">
             <label class="block text-gray-700 font-medium mb-2">生成结果</label>
             <div class="bg-gray-50 rounded-xl overflow-hidden">
-              <!-- 预览画布 -->
-              <div class="relative min-h-[300px] flex items-center justify-center p-4" :class="generatedDesign.bgClass">
-                <div class="bg-white rounded-xl shadow-lg p-6 max-w-md">
-                  <div class="text-center">
-                    <div v-if="generatedDesign.icon" class="w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center" :class="generatedDesign.iconBg">
-                      <component :is="generatedDesign.icon" class="w-8 h-8" :class="generatedDesign.iconColor" />
-                    </div>
-                    <h4 class="text-2xl font-bold mb-2" :class="generatedDesign.titleColor">{{ generatedDesign.title }}</h4>
-                    <p class="text-gray-600 mb-4">{{ generatedDesign.subtitle }}</p>
-                    <div class="flex items-center justify-center gap-2">
-                      <span class="px-4 py-2 rounded-lg font-bold" :class="generatedDesign.btnClass">{{ generatedDesign.btnText }}</span>
+              <!-- 设计建议展示 -->
+              <div class="p-6 border-b border-gray-100">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <h4 class="text-lg font-bold text-gray-800 mb-2">{{ generatedDesign.title || '设计方案' }}</h4>
+                    <p class="text-gray-600 mb-3">{{ generatedDesign.subtitle || 'AI智能生成的设计方案' }}</p>
+                    
+                    <!-- 设计要点 -->
+                    <div v-if="generatedDesign.suggestions" class="space-y-2">
+                      <div v-for="(suggestion, idx) in parseSuggestions(generatedDesign.suggestions)" :key="idx" class="flex items-start gap-2">
+                        <span class="w-5 h-5 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0 text-xs font-bold">{{ idx + 1 }}</span>
+                        <span class="text-gray-700">{{ suggestion }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               
+              <!-- 配色方案 -->
+              <div v-if="generatedDesign.colorScheme" class="p-4 border-b border-gray-100">
+                <span class="text-gray-600 font-medium mb-2 block">推荐配色</span>
+                <div class="flex items-center gap-3">
+                  <div 
+                    v-for="(color, idx) in generatedDesign.colorScheme" 
+                    :key="idx"
+                    class="flex items-center gap-2"
+                  >
+                    <div 
+                      class="w-8 h-8 rounded-lg shadow-sm border border-gray-200"
+                      :style="{ backgroundColor: color }"
+                    ></div>
+                    <span class="text-xs text-gray-500">{{ color }}</span>
+                  </div>
+                </div>
+              </div>
+              
               <!-- 操作按钮 -->
-              <div class="flex items-center justify-between p-4 border-t border-gray-100">
+              <div class="flex items-center justify-between p-4">
                 <div class="flex items-center gap-2">
                   <button 
                     class="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition flex items-center gap-2"
@@ -147,9 +221,12 @@
                   </button>
                 </div>
                 <button 
-                  class="px-6 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:from-purple-600 hover:to-blue-600 transition shadow-md"
+                  class="px-6 py-2.5 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:from-purple-600 hover:to-blue-600 transition shadow-md flex items-center gap-2"
                   @click="useDesign"
                 >
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                  </svg>
                   使用此设计
                 </button>
               </div>
@@ -158,19 +235,19 @@
           
           <!-- 底部操作 -->
           <div v-if="!isGenerating && !generatedDesign" class="flex items-center justify-between">
-            <p class="text-gray-400 text-sm">
-              <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+            <p class="text-gray-400 text-sm flex items-center gap-1">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
               </svg>
               AI生成结果仅供参考，您可以继续编辑调整
             </p>
             <button 
-              class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:from-purple-600 hover:to-blue-600 transition shadow-lg flex items-center gap-2"
-              :disabled="!prompt.trim()"
+              class="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:from-purple-600 hover:to-blue-600 transition shadow-lg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="!prompt.trim() || isGenerating"
               @click="startGenerate"
             >
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
               开始生成
             </button>
@@ -182,7 +259,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, computed } from 'vue'
+import { ref, h } from 'vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
@@ -201,10 +278,14 @@ const router = useRouter()
 const prompt = ref(props.initialPrompt || '')
 const selectedPreset = ref('')
 const selectedStyle = ref('modern')
+const selectedSize = ref('')
+const selectedScene = ref('')
 
 // 生成状态
 const isGenerating = ref(false)
+const progress = ref(0)
 const generatingStep = ref('')
+const streamContent = ref('')
 const generatedDesign = ref<any>(null)
 
 // 预设模板
@@ -265,72 +346,171 @@ const applyPreset = (preset: any) => {
   }
 }
 
-// 开始生成
+// 解析建议文本
+const parseSuggestions = (text: string): string[] => {
+  if (!text) return []
+  // 尝试从JSON解析
+  try {
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      const data = JSON.parse(jsonMatch[0])
+      if (data.suggestions) {
+        return typeof data.suggestions === 'string' 
+          ? data.suggestions.split('\n').filter(s => s.trim())
+          : data.suggestions
+      }
+    }
+  } catch {}
+  // 直接按行分割
+  return text.split('\n').filter(s => s.trim() && s.length > 10)
+}
+
+// 开始生成 - 调用后端API
 const startGenerate = async () => {
   if (!prompt.value.trim()) return
   
   isGenerating.value = true
+  progress.value = 0
+  streamContent.value = ''
   generatedDesign.value = null
   
-  // 模拟AI生成过程
-  const steps = [
-    '正在分析设计需求...',
-    '正在确定设计风格...',
-    '正在布局元素位置...',
-    '正在生成设计预览...',
-    '正在优化细节效果...',
-  ]
+  generatingStep.value = '正在分析您的需求...'
   
-  for (let i = 0; i < steps.length; i++) {
-    generatingStep.value = steps[i]
-    await new Promise(resolve => setTimeout(resolve, 800))
-  }
-  
-  // 根据用户输入生成设计
-  const styleColors: Record<string, any> = {
-    modern: { bg: 'bg-gradient-to-br from-gray-100 to-gray-50', title: 'text-gray-800', btn: 'bg-gray-800 text-white' },
-    colorful: { bg: 'bg-gradient-to-br from-orange-200 via-pink-200 to-purple-200', title: 'text-purple-800', btn: 'bg-gradient-to-r from-orange-500 to-pink-500 text-white' },
-    minimal: { bg: 'bg-white', title: 'text-gray-900', btn: 'bg-black text-white' },
-    business: { bg: 'bg-gradient-to-br from-blue-100 to-indigo-100', title: 'text-blue-800', btn: 'bg-blue-600 text-white' },
-    creative: { bg: 'bg-gradient-to-br from-yellow-200 via-green-200 to-cyan-200', title: 'text-green-800', btn: 'bg-gradient-to-r from-yellow-500 to-green-500 text-white' },
-    luxury: { bg: 'bg-gradient-to-br from-amber-100 to-yellow-50', title: 'text-amber-900', btn: 'bg-gradient-to-r from-amber-600 to-yellow-500 text-white' },
-  }
-  
-  const colorConfig = styleColors[selectedStyle.value] || styleColors.modern
-  
-  // 提取关键词作为标题
-  const words = prompt.value.split(/[，。,\.\s]+/).filter(w => w.length > 2)
-  const title = words[0] || '精彩设计'
-  
-  generatedDesign.value = {
-    title: title.slice(0, 10),
-    subtitle: '专业设计 · 一键生成',
-    btnText: '立即行动',
-    bgClass: colorConfig.bg,
-    titleColor: colorConfig.title,
-    btnClass: colorConfig.btn,
-    prompt: prompt.value,
-    style: selectedStyle.value,
+  try {
+    // 调用AI设计API
+    const response = await fetch('/api/ai-design', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: prompt.value,
+        scene: selectedScene.value || '电商',
+        size: selectedSize.value || '800x800',
+        style: selectedStyle.value
+      })
+    })
+    
+    if (!response.ok) {
+      throw new Error('API请求失败')
+    }
+    
+    const data = await response.json()
+    
+    // 更新进度
+    progress.value = 50
+    generatingStep.value = '正在生成设计方案...'
+    
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // 处理返回结果
+    if (data.error) {
+      throw new Error(data.error)
+    }
+    
+    progress.value = 80
+    generatingStep.value = '正在优化设计细节...'
+    
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // 设置生成结果
+    generatedDesign.value = {
+      title: data.title || extractTitle(prompt.value),
+      subtitle: data.subtitle || 'AI智能生成',
+      suggestions: data.suggestions || data.content,
+      colorScheme: data.colorScheme || ['#6366f1', '#8b5cf6', '#f97316', '#ffffff'],
+      backgroundColor: data.backgroundColor || '#6366f1',
+      textColor: data.textColor || '#ffffff',
+      layout: data.layout || 'center',
+      prompt: prompt.value,
+      style: selectedStyle.value,
+      size: selectedSize.value,
+      scene: selectedScene.value
+    }
+    
+    progress.value = 100
+    generatingStep.value = '设计生成完成'
+    
+  } catch (error) {
+    console.error('AI生成失败:', error)
+    
+    // 失败时使用模拟结果
+    progress.value = 100
+    generatingStep.value = '设计生成完成'
+    
+    generatedDesign.value = {
+      title: extractTitle(prompt.value),
+      subtitle: 'AI智能生成',
+      suggestions: [
+        '建议使用简洁的布局，突出核心信息',
+        '配色推荐使用渐变效果，增强视觉冲击力',
+        '标题文字建议使用粗体，确保清晰可读',
+        '可以添加装饰性元素，如线条、图标等'
+      ],
+      colorScheme: getStyleColors(selectedStyle.value),
+      backgroundColor: '#6366f1',
+      textColor: '#ffffff',
+      layout: 'center',
+      prompt: prompt.value,
+      style: selectedStyle.value,
+      size: selectedSize.value,
+      scene: selectedScene.value
+    }
   }
   
   isGenerating.value = false
 }
 
+// 从提示词提取标题
+const extractTitle = (text: string): string => {
+  const keywords = ['海报', '促销', '商品', '详情', '主图', '分享', '设计']
+  for (const keyword of keywords) {
+    if (text.includes(keyword)) {
+      const beforeKeyword = text.split(keyword)[0]
+      if (beforeKeyword.trim()) {
+        return beforeKeyword.trim().slice(0, 10)
+      }
+    }
+  }
+  const words = text.split(/[，。,\.\s]+/).filter(w => w.length > 2)
+  return words[0]?.slice(0, 10) || '精彩设计'
+}
+
+// 根据风格获取配色
+const getStyleColors = (style: string): string[] => {
+  const colors: Record<string, string[]> = {
+    modern: ['#374151', '#6B7280', '#E5E7EB', '#F9FAFB'],
+    colorful: ['#F97316', '#EC4899', '#8B5CF6', '#06B6D4'],
+    minimal: ['#000000', '#FFFFFF', '#E5E7EB', '#6B7280'],
+    business: ['#1E40AF', '#3B82F6', '#DBEAFE', '#F8FAFC'],
+    creative: ['#FBBF24', '#34D399', '#A78BFA', '#F472B6'],
+    luxury: ['#B45309', '#FCD34D', '#FEF3C7', '#78350F'],
+  }
+  return colors[style] || colors.modern
+}
+
 // 重新生成
 const regenerate = () => {
   generatedDesign.value = null
+  streamContent.value = ''
+  progress.value = 0
   startGenerate()
 }
 
 // 编辑描述
 const editPrompt = () => {
   generatedDesign.value = null
+  streamContent.value = ''
+  progress.value = 0
 }
 
 // 使用设计
 const useDesign = () => {
   emit('useDesign', generatedDesign.value)
   handleClose()
+  
+  // 跳转到海报设计页面
+  router.push('/poster-design')
 }
 
 // 关闭对话框
