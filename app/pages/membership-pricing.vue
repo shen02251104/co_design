@@ -380,22 +380,19 @@
               </div>
             </div>
             <div class="space-y-2 mb-4">
-              <div class="flex justify-between items-center p-2 bg-slate-50 rounded">
+              <button @click="handlePurchaseCredits('ai_20')" class="w-full flex justify-between items-center p-2 bg-slate-50 rounded hover:bg-slate-100 transition">
                 <span class="text-slate-600">20次</span>
                 <span class="font-bold text-purple-600">¥10</span>
-              </div>
-              <div class="flex justify-between items-center p-2 bg-slate-50 rounded">
-                <span class="text-slate-600">50次</span>
+              </button>
+              <button @click="handlePurchaseCredits('ai_50')" class="w-full flex justify-between items-center p-2 bg-purple-50 rounded border border-purple-200 hover:bg-purple-100 transition">
+                <span class="text-slate-600">50次 <span class="text-xs text-purple-500">推荐</span></span>
                 <span class="font-bold text-purple-600">¥30</span>
-              </div>
-              <div class="flex justify-between items-center p-2 bg-slate-50 rounded">
-                <span class="text-slate-600">100次</span>
+              </button>
+              <button @click="handlePurchaseCredits('ai_100')" class="w-full flex justify-between items-center p-2 bg-slate-50 rounded hover:bg-slate-100 transition">
+                <span class="text-slate-600">100次 <span class="text-xs text-green-500">最划算</span></span>
                 <span class="font-bold text-purple-600">¥50</span>
-              </div>
+              </button>
             </div>
-            <button @click="handlePurchaseCredits('ai')" class="w-full py-2 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition">
-              购买次数包
-            </button>
           </div>
 
           <!-- 单模板购买 -->
@@ -516,35 +513,64 @@
       </div>
     </div>
 
-    <!-- Purchase Dialog -->
-    <VipPurchaseDialog 
-      v-if="showPurchaseDialog"
-      :selected-plan="selectedPlan"
-      @close="showPurchaseDialog = false"
+    <!-- Payment Dialog -->
+    <PaymentDialog 
+      :visible="showPaymentDialog"
+      :product-id="selectedProductId"
+      :user-id="currentUserId"
+      @close="showPaymentDialog = false"
+      @success="handlePaymentSuccess"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import PaymentDialog from '~/components/PaymentDialog.vue'
 
 const billingCycle = ref<'monthly' | 'yearly'>('yearly')
-const showPurchaseDialog = ref(false)
-const selectedPlan = ref('')
+const showPaymentDialog = ref(false)
+const selectedProductId = ref('')
+const currentUserId = ref('guest_' + Date.now()) // 实际使用时从登录状态获取
+
+// 根据套餐类型和周期生成产品ID
+const getProductId = (plan: string) => {
+  if (plan === 'lifetime') {
+    return 'vip_lifetime'
+  }
+  const prefix = `vip_${plan}`
+  const suffix = billingCycle.value === 'yearly' ? '_yearly' : '_monthly'
+  return `${prefix}${suffix}`
+}
 
 const handlePurchase = (plan: string) => {
-  selectedPlan.value = plan
-  showPurchaseDialog.value = true
+  selectedProductId.value = getProductId(plan)
+  showPaymentDialog.value = true
 }
 
 const handlePurchaseCredits = (type: string) => {
-  // Navigate to credits purchase page or show dialog
   if (type === 'template') {
     navigateTo('/poster-design?menu=templates')
+  } else if (type === 'ai_20') {
+    selectedProductId.value = 'ai_credits_20'
+    showPaymentDialog.value = true
+  } else if (type === 'ai_50') {
+    selectedProductId.value = 'ai_credits_50'
+    showPaymentDialog.value = true
+  } else if (type === 'ai_100') {
+    selectedProductId.value = 'ai_credits_100'
+    showPaymentDialog.value = true
   } else {
-    selectedPlan.value = `credits_${type}`
-    showPurchaseDialog.value = true
+    // License购买暂时跳转说明页面
+    alert('商用授权购买功能开发中，请联系客服')
   }
+}
+
+const handlePaymentSuccess = () => {
+  // 支付成功后刷新会员状态或跳转
+  alert('支付成功！会员权益已开通')
+  // 可以刷新用户会员状态或跳转到设计页面
+  navigateTo('/poster-design')
 }
 
 // SEO
