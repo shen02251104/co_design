@@ -1,4 +1,17 @@
 import crypto from 'crypto';
+import { Pool } from 'pg';
+
+let pool: Pool | null = null;
+
+function getPool(): Pool {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.COZE_DATABASE_URL || process.env.DATABASE_URL,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    });
+  }
+  return pool;
+}
 
 /**
  * 支付配置
@@ -10,13 +23,13 @@ const PAYMENT_CONFIG = {
     privateKey: process.env.ALIPAY_PRIVATE_KEY || 'YOUR_ALIPAY_PRIVATE_KEY',
     publicKey: process.env.ALIPAY_PUBLIC_KEY || 'YOUR_ALIPAY_PUBLIC_KEY',
     gateway: 'https://openapi.alipay.com/gateway.do',
-    notifyUrl: `${process.env.COZE_PROJECT_DOMAIN_DEFAULT}/api/payment/callback/alipay`,
+    notifyUrl: `${process.env.COZE_PROJECT_DOMAIN_DEFAULT || 'http://localhost:5000'}/api/payment/callback/alipay`,
   },
   wechat: {
     appId: process.env.WECHAT_APP_ID || 'YOUR_WECHAT_APP_ID',
     mchId: process.env.WECHAT_MCH_ID || 'YOUR_WECHAT_MCH_ID',
     apiKey: process.env.WECHAT_API_KEY || 'YOUR_WECHAT_API_KEY',
-    notifyUrl: `${process.env.COZE_PROJECT_DOMAIN_DEFAULT}/api/payment/callback/wechat`,
+    notifyUrl: `${process.env.COZE_PROJECT_DOMAIN_DEFAULT || 'http://localhost:5000'}/api/payment/callback/wechat`,
     gateway: 'https://api.mch.weixin.qq.com/v3/pay/transactions/native',
   }
 };
@@ -60,29 +73,28 @@ function wechatSign(params: Record<string, string | number>, apiKey: string): st
 /**
  * 产品价格配置
  */
-const PRODUCT_PRICES = {
+const PRODUCT_PRICES: Record<string, { name: string; price: number; aiCount: number; vipLevel: string | null; durationDays: number | null }> = {
   vip_basic_monthly: { name: '易可图基础版月卡', price: 19, aiCount: 50, vipLevel: 'basic', durationDays: 30 },
   vip_basic_yearly: { name: '易可图基础版年卡', price: 159, aiCount: 50, vipLevel: 'basic', durationDays: 365 },
   vip_pro_monthly: { name: '易可图专业版月卡', price: 39, aiCount: 200, vipLevel: 'pro', durationDays: 30 },
   vip_pro_yearly: { name: '易可图专业版年卡', price: 299, aiCount: 200, vipLevel: 'pro', durationDays: 365 },
-  vip_lifetime: { name: '易可图终身版', price: 389, aiCount: -1, vipLevel: 'lifetime', durationDays: -1 },
+  vip_lifetime: { name: '易可图终身版', price: 389, aiCount: -1, vipLevel: 'lifetime', durationDays: null },
   ai_credits_20: { name: 'AI设计次数20次', price: 10, aiCount: 20, vipLevel: null, durationDays: null },
   ai_credits_50: { name: 'AI设计次数50次', price: 30, aiCount: 50, vipLevel: null, durationDays: null },
   ai_credits_100: { name: 'AI设计次数100次', price: 50, aiCount: 100, vipLevel: null, durationDays: null },
 };
 
-interface CreateOrderRequest {
-  userId: string;
-  productId: string;
-  paymentMethod: 'alipay' | 'wechat';
-}
-
 export default defineEventHandler(async (event) => {
-  const body = await readBody<CreateOrderRequest>(event);
-  const { userId, productId, paymentMethod } = body;
+  const pool = getPool();
+  const body = await readBody(event);
+  const { productId, paymentMethod, userId: providedUserId } = body as { productId: string; paymentMethod: string; userId?: string };
+
+  // 获取用户认证信息（优先使用登录用户的ID）
+  const authHeader = getHeader(event, 'x-session') || getHeader(event, 'authorization');
+  const userId = authHeader ? 'user_' + authHeader.substring(0, 8) : providedUserId || 'anonymous';
 
   // 验证产品ID
-  const product = PRODUCT_PRICES[productId as keyof typeof PRODUCT_PRICES];
+  const product = PRODUCT_PRICES[productId];
   if (!product) {
     return { error: '无效的产品ID', success: false };
   }
@@ -96,27 +108,26 @@ export default defineEventHandler(async (event) => {
   const orderNo = generateOrderNo();
 
   // 创建订单记录
-  const client = useSupabaseClient(event);
-  const { data: order, error: dbError } = await client
-    .from('payment_orders')
-    .insert({
-      order_no: orderNo,
-      user_id: userId,
-      product_type: productId,
-      product_name: product.name,
-      amount: product.price,
-      payment_method: paymentMethod,
-      status: 'pending',
-      extra_data: {
-        aiCount: product.aiCount,
-        vipLevel: product.vipLevel,
-        durationDays: product.durationDays,
-      }
-    })
-    .select()
-    .single();
-
-  if (dbError) {
+  try {
+    await pool.query(
+      `INSERT INTO payment_orders (order_no, user_id, product_type, product_name, amount, payment_method, status, extra_data)
+       VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7)`,
+      [
+        orderNo,
+        userId,
+        productId,
+        product.name,
+        product.price,
+        paymentMethod,
+        JSON.stringify({
+          aiCount: product.aiCount,
+          vipLevel: product.vipLevel,
+          durationDays: product.durationDays,
+        })
+      ]
+    );
+  } catch (error) {
+    console.error('创建订单失败:', error);
     return { error: '创建订单失败', success: false };
   }
 
@@ -127,7 +138,7 @@ export default defineEventHandler(async (event) => {
   try {
     if (paymentMethod === 'alipay') {
       // 支付宝扫码支付
-      const alipayParams = {
+      const alipayParams: Record<string, string> = {
         app_id: PAYMENT_CONFIG.alipay.appId,
         method: 'alipay.trade.precreate',
         format: 'JSON',
@@ -148,13 +159,12 @@ export default defineEventHandler(async (event) => {
       alipayParams.sign = sign;
 
       // 实际项目中需要调用支付宝API获取二维码链接
-      // 这里返回模拟数据，实际使用时替换为真实API调用
       qrCodeUrl = `https://qr.alipay.com/${orderNo}`;
       paymentUrl = `${PAYMENT_CONFIG.alipay.gateway}?${Object.entries(alipayParams).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&')}`;
 
     } else if (paymentMethod === 'wechat') {
       // 微信扫码支付（Native模式）
-      const wechatParams = {
+      const wechatParams: Record<string, string | number> = {
         appid: PAYMENT_CONFIG.wechat.appId,
         mch_id: PAYMENT_CONFIG.wechat.mchId,
         nonce_str: crypto.randomBytes(16).toString('hex'),
@@ -170,13 +180,11 @@ export default defineEventHandler(async (event) => {
       wechatParams.sign = sign;
 
       // 实际项目中需要调用微信API获取二维码链接
-      // 这里返回模拟数据
       qrCodeUrl = `weixin://wxpay/bizpayurl?pr=${orderNo}`;
       paymentUrl = JSON.stringify(wechatParams);
     }
   } catch (err) {
     console.error('生成支付链接失败:', err);
-    // 即使支付链接生成失败，订单已创建，可以返回订单信息让前端轮询
   }
 
   return {
@@ -187,6 +195,6 @@ export default defineEventHandler(async (event) => {
     paymentMethod,
     qrCodeUrl: qrCodeUrl || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(orderNo)}`,
     paymentUrl,
-    createdAt: order.created_at,
+    createdAt: new Date().toISOString(),
   };
 });

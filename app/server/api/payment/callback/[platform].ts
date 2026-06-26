@@ -1,4 +1,17 @@
 import crypto from 'crypto';
+import { Pool } from 'pg';
+
+let pool: Pool | null = null;
+
+function getPool(): Pool {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.COZE_DATABASE_URL || process.env.DATABASE_URL,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    });
+  }
+  return pool;
+}
 
 /**
  * 支付回调处理API
@@ -58,19 +71,22 @@ function verifyWechatSign(params: Record<string, string>, apiKey: string): boole
 /**
  * 更新用户会员状态
  */
-async function updateUserMembership(client: any, userId: string, orderData: any) {
-  const { vipLevel, durationDays, aiCount } = orderData.extra_data || {};
+async function updateUserMembership(pool: Pool, userId: string, orderData: any) {
+  const extraData = orderData.extra_data || {};
+  const vipLevel = extraData.vipLevel;
+  const durationDays = extraData.durationDays;
+  const aiCount = extraData.aiCount;
   
   // 查询用户当前会员状态
-  const { data: existingMembership } = await client
-    .from('user_membership')
-    .select('*')
-    .eq('user_id', userId)
-    .single();
+  const existingResult = await pool.query(
+    'SELECT * FROM user_membership WHERE user_id = $1',
+    [userId]
+  );
+  const existingMembership = existingResult.rows[0];
 
   const now = new Date();
   let vipStartDate = now;
-  let vipEndDate = null;
+  let vipEndDate: Date | null = null;
   
   if (durationDays && durationDays > 0) {
     // 如果已有会员，从当前结束日期延长
@@ -82,40 +98,64 @@ async function updateUserMembership(client: any, userId: string, orderData: any)
       vipEndDate = new Date(now);
       vipEndDate.setDate(vipEndDate.getDate() + durationDays);
     }
-  } else if (durationDays === -1) {
+  } else if (durationDays === null && vipLevel === 'lifetime') {
     // 终身会员
     vipEndDate = new Date('2099-12-31');
   }
 
-  // 构建更新数据
-  const membershipData = {
-    user_id: userId,
-    vip_level: vipLevel || (existingMembership?.vip_level || 'free'),
-    vip_start_date: vipStartDate.toISOString(),
-    vip_end_date: vipEndDate?.toISOString(),
-    updated_at: now.toISOString(),
-  };
-
   // 如果是购买AI次数，增加额外次数
+  let aiExtraCount = existingMembership?.ai_extra_count || 0;
   if (aiCount && aiCount > 0 && !vipLevel) {
-    membershipData.ai_extra_count = (existingMembership?.ai_extra_count || 0) + aiCount;
+    aiExtraCount += aiCount;
+  }
+
+  // 确定VIP等级（如果是购买VIP则升级，否则保持原等级）
+  let newVipLevel = existingMembership?.vip_level || 'free';
+  if (vipLevel) {
+    // 升级逻辑：终身 > 专业 > 基础 > 免费
+    const levelOrder = { lifetime: 4, pro: 3, basic: 2, free: 1 };
+    if (levelOrder[vipLevel as keyof typeof levelOrder] > levelOrder[newVipLevel as keyof typeof levelOrder]) {
+      newVipLevel = vipLevel;
+    }
   }
 
   // 更新或创建会员记录
   if (existingMembership) {
-    await client
-      .from('user_membership')
-      .update(membershipData)
-      .eq('user_id', userId);
+    await pool.query(
+      `UPDATE user_membership 
+       SET vip_level = $1, vip_start_date = $2, vip_end_date = $3, 
+           ai_extra_count = $4, updated_at = $5
+       WHERE user_id = $6`,
+      [
+        newVipLevel,
+        vipStartDate.toISOString(),
+        vipEndDate?.toISOString() || existingMembership.vip_end_date,
+        aiExtraCount,
+        now.toISOString(),
+        userId
+      ]
+    );
   } else {
-    membershipData.ai_usage_reset_at = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
-    await client
-      .from('user_membership')
-      .insert(membershipData);
+    const resetDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    await pool.query(
+      `INSERT INTO user_membership 
+       (user_id, vip_level, vip_start_date, vip_end_date, ai_extra_count, ai_usage_reset_at, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $7)`,
+      [
+        userId,
+        newVipLevel,
+        vipStartDate.toISOString(),
+        vipEndDate?.toISOString(),
+        aiExtraCount,
+        resetDate.toISOString(),
+        now.toISOString()
+      ]
+    );
   }
 }
 
 export default defineEventHandler(async (event) => {
+  const pgPool = getPool();
   const path = event.path;
   const method = event.method;
   
@@ -125,7 +165,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event);
-  const client = useSupabaseClient(event);
 
   try {
     // 判断是支付宝还是微信回调
@@ -145,26 +184,23 @@ export default defineEventHandler(async (event) => {
 
       if (tradeStatus === 'TRADE_SUCCESS' || tradeStatus === 'TRADE_FINISHED') {
         // 查询订单
-        const { data: order } = await client
-          .from('payment_orders')
-          .select('*')
-          .eq('order_no', orderNo)
-          .single();
+        const orderResult = await pgPool.query(
+          'SELECT * FROM payment_orders WHERE order_no = $1',
+          [orderNo]
+        );
+        const order = orderResult.rows[0];
 
         if (order && order.status === 'pending') {
           // 更新订单状态
-          await client
-            .from('payment_orders')
-            .update({
-              status: 'paid',
-              payment_no: tradeNo,
-              paid_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-            .eq('order_no', orderNo);
+          await pgPool.query(
+            `UPDATE payment_orders 
+             SET status = 'paid', payment_no = $1, paid_at = $2, updated_at = $2
+             WHERE order_no = $3`,
+            [tradeNo, new Date().toISOString(), orderNo]
+          );
 
           // 更新用户会员状态
-          await updateUserMembership(client, order.user_id, order);
+          await updateUserMembership(pgPool, order.user_id, order);
         }
       }
 
@@ -183,26 +219,23 @@ export default defineEventHandler(async (event) => {
 
       if (result_code === 'SUCCESS') {
         // 查询订单
-        const { data: order } = await client
-          .from('payment_orders')
-          .select('*')
-          .eq('order_no', out_trade_no)
-          .single();
+        const orderResult = await pgPool.query(
+          'SELECT * FROM payment_orders WHERE order_no = $1',
+          [out_trade_no]
+        );
+        const order = orderResult.rows[0];
 
         if (order && order.status === 'pending') {
           // 更新订单状态
-          await client
-            .from('payment_orders')
-            .update({
-              status: 'paid',
-              payment_no: transaction_id,
-              paid_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-            .eq('order_no', out_trade_no);
+          await pgPool.query(
+            `UPDATE payment_orders 
+             SET status = 'paid', payment_no = $1, paid_at = $2, updated_at = $2
+             WHERE order_no = $3`,
+            [transaction_id, new Date().toISOString(), out_trade_no]
+          );
 
           // 更新用户会员状态
-          await updateUserMembership(client, order.user_id, order);
+          await updateUserMembership(pgPool, order.user_id, order);
         }
       }
 
@@ -210,9 +243,9 @@ export default defineEventHandler(async (event) => {
       return { code: 'SUCCESS', message: '成功' };
     }
 
-    return { error: '未知支付渠道' };
-  } catch (err) {
-    console.error('支付回调处理失败:', err);
+    return { error: '未知的支付平台' };
+  } catch (error) {
+    console.error('支付回调处理失败:', error);
     
     if (path.includes('/alipay')) {
       return 'fail';

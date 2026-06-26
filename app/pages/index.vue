@@ -186,7 +186,26 @@
         <div class="col-span-8">
           <!-- 模板分类标签 -->
           <div class="flex items-center gap-2 mb-4 flex-wrap">
-            <span class="px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg text-sm font-medium shadow-sm">全部模板</span>
+            <span 
+              class="px-3 py-1.5 text-white rounded-lg text-sm font-medium shadow-sm cursor-pointer transition-colors"
+              :class="templateFilter === 'all' ? 'bg-gradient-to-r from-purple-500 to-blue-500' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'"
+              @click="templateFilter = 'all'"
+            >全部模板</span>
+            <span 
+              class="px-3 py-1.5 rounded-lg text-sm cursor-pointer shadow-sm border border-gray-100 transition-colors"
+              :class="templateFilter === 'vip' ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
+              @click="templateFilter = 'vip'"
+            >
+              <svg class="w-3.5 h-3.5 inline mr-1 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/>
+              </svg>
+              VIP专属
+            </span>
+            <span 
+              class="px-3 py-1.5 rounded-lg text-sm cursor-pointer shadow-sm border border-gray-100 transition-colors"
+              :class="templateFilter === 'free' ? 'bg-gradient-to-r from-green-400 to-teal-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
+              @click="templateFilter = 'free'"
+            >免费模板</span>
             <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer shadow-sm border border-gray-100">电商海报</span>
             <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer shadow-sm border border-gray-100">商品主图</span>
             <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer shadow-sm border border-gray-100">详情页</span>
@@ -203,7 +222,7 @@
           <!-- 模板卡片网格 -->
           <div class="grid grid-cols-4 gap-4">
             <div 
-              v-for="template in templates" 
+              v-for="template in filteredTemplates" 
               :key="template.id"
               class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer group"
               @click="useTemplate(template)"
@@ -217,10 +236,11 @@
                   </div>
                 </div>
                 <!-- VIP标识 -->
-                <div v-if="template.isVip" class="absolute top-2 right-2">
-                  <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                <div v-if="template.isVip" class="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 shadow-lg">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/>
                   </svg>
+                  VIP
                 </div>
                 <!-- 悬浮操作 -->
                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -506,6 +526,9 @@ import VipPurchaseDialog from '~/components/VipPurchaseDialog.vue'
 
 const router = useRouter()
 
+// 用户认证状态
+const { user, membership, isLoggedIn, isVip, refreshMembership } = useAuth()
+
 // 弹窗状态
 const showAIDialog = ref(false)
 const showTemplatePreview = ref(false)
@@ -549,6 +572,19 @@ const templates = [
   { id: 7, name: '直播预告海报', size: '1080×1920', useCount: 1125, previewText: '直播', bgColor: 'bg-gradient-to-br from-yellow-400 to-orange-400', isVip: false },
   { id: 8, name: '品牌宣传海报', size: '1200×628', useCount: 892, previewText: '品牌', bgColor: 'bg-gradient-to-br from-gray-700 to-gray-900', isVip: true },
 ]
+
+// 模板筛选状态
+const templateFilter = ref<'all' | 'vip' | 'free'>('all')
+
+// 筛选后的模板列表
+const filteredTemplates = computed(() => {
+  if (templateFilter.value === 'vip') {
+    return templates.filter(t => t.isVip)
+  } else if (templateFilter.value === 'free') {
+    return templates.filter(t => !t.isVip)
+  }
+  return templates
+})
 
 // 快捷工具列表
 const quickTools = [
@@ -629,8 +665,14 @@ const openWork = (work: { id: number }) => {
   router.push(`/poster-design?work=${work.id}`)
 }
 
-// 使用模板 - 显示预览
+// 使用模板 - 显示预览（VIP模板需要验证会员状态）
 const useTemplate = (template: any) => {
+  // VIP模板需要验证会员状态
+  if (template.isVip && !isVip.value) {
+    selectedTemplate.value = template
+    showVipDialog.value = true
+    return
+  }
   selectedTemplate.value = template
   showTemplatePreview.value = true
 }

@@ -521,17 +521,55 @@
       @close="showPaymentDialog = false"
       @success="handlePaymentSuccess"
     />
+
+    <!-- Login Tip Dialog -->
+    <div v-if="showLoginTip" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[2147483647]">
+      <div class="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
+        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-2">请先登录</h3>
+        <p class="text-slate-600 mb-6">购买会员需要先登录账号，登录后可享受完整的会员权益</p>
+        <div class="flex gap-3">
+          <button @click="showLoginTip = false" class="flex-1 py-3 rounded-lg border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition">
+            取消
+          </button>
+          <button @click="navigateTo('/login')" class="flex-1 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:opacity-90 transition">
+            前往登录
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import PaymentDialog from '~/components/PaymentDialog.vue'
+import { useAuth } from '~/composables/useAuth'
 
 const billingCycle = ref<'monthly' | 'yearly'>('yearly')
 const showPaymentDialog = ref(false)
 const selectedProductId = ref('')
-const currentUserId = ref('guest_' + Date.now()) // 实际使用时从登录状态获取
+const showLoginTip = ref(false)
+
+// 使用登录状态
+const { user, isLoggedIn, fetchUser } = useAuth()
+
+// 获取当前用户ID
+const currentUserId = computed(() => {
+  if (isLoggedIn.value && user.value?.id) {
+    return user.value.id
+  }
+  return 'guest_' + Date.now() // 游客用户ID
+})
+
+// 初始化时获取用户信息
+onMounted(() => {
+  fetchUser()
+})
 
 // 根据套餐类型和周期生成产品ID
 const getProductId = (plan: string) => {
@@ -544,11 +582,21 @@ const getProductId = (plan: string) => {
 }
 
 const handlePurchase = (plan: string) => {
+  // 检查登录状态
+  if (!isLoggedIn.value) {
+    showLoginTip.value = true
+    return
+  }
   selectedProductId.value = getProductId(plan)
   showPaymentDialog.value = true
 }
 
 const handlePurchaseCredits = (type: string) => {
+  // 检查登录状态（浏览模板不需要登录）
+  if (!isLoggedIn.value && type !== 'template') {
+    showLoginTip.value = true
+    return
+  }
   if (type === 'template') {
     navigateTo('/poster-design?menu=templates')
   } else if (type === 'ai_20') {
