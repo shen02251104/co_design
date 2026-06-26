@@ -57,24 +57,31 @@
               </svg>
               推广返现
             </button>
-            <!-- 充值 -->
-            <button class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition flex items-center gap-2">
-              <span class="bg-blue-500 text-white text-xs px-1.5 rounded font-bold">17</span>
-              充值
-            </button>
+            <!-- AI次数 - 仅登录用户显示 -->
+            <NuxtLink v-if="isLoggedIn" to="/user-center" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition flex items-center gap-2">
+              <span class="bg-blue-500 text-white text-xs px-1.5 rounded font-bold">{{ aiCredits }}</span>
+              AI次数
+            </NuxtLink>
             <!-- 升级会员 - 带钻石图标 -->
-            <button class="px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition flex items-center gap-2">
+            <NuxtLink to="/membership-pricing" class="px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition flex items-center gap-2">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 3H5L2 9l10 12L22 9l-3-6zM9.62 8l1.5-3h1.76l1.5 3H9.62zM11 10v6.68L5.44 10H11zm2 0h5.56L13 16.68V10zm6.26-2h-2.65l-1.5-3h2.65l1.5 3zM6.24 5h2.65l-1.5 3H4.74l1.5-3z"/>
               </svg>
               升级会员
-            </button>
-            <!-- 用户头像 -->
-            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition">
-              <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-              </svg>
-            </div>
+            </NuxtLink>
+            <!-- 未登录状态 - 显示登录按钮 -->
+            <NuxtLink v-if="!isLoggedIn" to="/login" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+              登录
+            </NuxtLink>
+            <!-- 登录状态 - 显示用户头像 -->
+            <NuxtLink v-else to="/user-center" class="flex items-center gap-2 hover:bg-gray-100 rounded-lg px-2 py-1 transition">
+              <!-- VIP标识 -->
+              <span v-if="isVip" class="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-xs px-1.5 py-0.5 rounded font-bold">VIP</span>
+              <!-- 用户头像 -->
+              <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                <span class="text-white text-sm font-medium">{{ userInitial }}</span>
+              </div>
+            </NuxtLink>
           </div>
         </div>
       </header>
@@ -96,6 +103,16 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuth } from '~/composables/useAuth'
+
+const { user, isLoggedIn, isVip } = useAuth()
+
+const userInitial = computed(() => {
+  if (user.value?.email) {
+    return user.value.email.charAt(0).toUpperCase()
+  }
+  return 'U'
+})
 
 interface NavItem {
   id: string
