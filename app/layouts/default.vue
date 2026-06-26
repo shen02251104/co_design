@@ -36,9 +36,6 @@
     
     <!-- 主内容区域 -->
     <main class="flex-1 ml-56">
-      <!-- 顶部横幅广告 -->
-      <TopBanner />
-      
       <!-- 头部功能区 -->
       <header class="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-3 shadow-sm">
         <div class="flex items-center justify-between">
