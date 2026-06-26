@@ -113,6 +113,7 @@ const navItems: NavItem[] = [
   { id: 'poster-design', name: '海报设计', icon: 'template', path: '/poster-design' },
   { id: 'templates', name: '模板', icon: 'grid', path: '/templates' },
   { id: 'materials', name: '素材', icon: 'triangle', path: '/materials' },
+  { id: 'pricing', name: '会员价格', icon: 'vip', path: '/membership-pricing' },
   { id: 'space', name: '空间', icon: 'user', path: '/space' },
 ]
 

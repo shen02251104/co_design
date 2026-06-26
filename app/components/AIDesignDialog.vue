@@ -40,6 +40,40 @@
         
         <!-- 主体内容 -->
         <div class="p-6">
+          <!-- AI次数提示 -->
+          <div class="mb-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1 px-3 py-1.5 rounded-full" :class="aiUsage.isVip ? 'bg-purple-100' : 'bg-gray-100'">
+                <svg class="w-4 h-4" :class="aiUsage.isVip ? 'text-purple-600' : 'text-gray-500'" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <span class="text-sm font-medium" :class="aiUsage.isVip ? 'text-purple-600' : 'text-gray-600'">
+                  AI次数: {{ aiUsage.isUnlimited ? '无限' : `${aiUsage.remaining}/${aiUsage.vipLimit}` }}
+                </span>
+              </div>
+              <span v-if="aiUsage.isVip" class="text-xs px-2 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full">
+                {{ aiUsage.vipLevel === 'lifetime' ? '终身会员' : 'VIP会员' }}
+              </span>
+            </div>
+            <button 
+              @click="showCreditsDialog = true"
+              class="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              购买次数
+            </button>
+          </div>
+          
+          <!-- 次数不足警告 -->
+          <div v-if="showUsageWarning" class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2">
+            <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            <span class="text-yellow-700 text-sm">AI次数即将用完，请及时购买次数包</span>
+          </div>
+          
           <!-- 输入区域 -->
           <div class="mb-6">
             <label class="block text-gray-700 font-medium mb-2">设计描述</label>
@@ -255,12 +289,20 @@
         </div>
       </div>
     </div>
+    
+    <!-- AI次数购买弹窗 -->
+    <AiCreditsDialog 
+      :visible="showCreditsDialog"
+      @close="showCreditsDialog = false"
+      @purchase="handlePurchaseCredits"
+    />
   </Teleport>
 </template>
 
 <script setup lang="ts">
 import { ref, h } from 'vue'
 import { useRouter } from 'vue-router'
+import AiCreditsDialog from './AiCreditsDialog.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -273,6 +315,71 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+
+// AI次数相关状态
+const aiUsage = ref({
+  vipLevel: 'free',
+  vipLimit: 5,
+  usedCount: 0,
+  extraCount: 0,
+  remaining: 5,
+  isVip: false,
+  isUnlimited: false
+})
+const showCreditsDialog = ref(false)
+const showUsageWarning = ref(false)
+
+// 获取AI使用情况
+const fetchAiUsage = async () => {
+  try {
+    const response = await fetch('/api/ai-usage')
+    if (response.ok) {
+      const data = await response.json()
+      if (data.success) {
+        aiUsage.value = data.data
+      }
+    }
+  } catch (error) {
+    console.error('获取AI使用情况失败:', error)
+  }
+}
+
+// 检查是否有足够的次数
+const checkAiUsage = async () => {
+  try {
+    const response = await fetch('/api/ai-usage', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    
+    if (response.status === 403) {
+      // 次数已用完
+      const data = await response.json()
+      aiUsage.value = data.data
+      showCreditsDialog.value = true
+      return false
+    }
+    
+    if (response.ok) {
+      const data = await response.json()
+      if (data.warning) {
+        showUsageWarning.value = true
+        setTimeout(() => {
+          showUsageWarning.value = false
+        }, 3000)
+      }
+      aiUsage.value.remaining = data.remaining
+      return true
+    }
+    
+    return false
+  } catch (error) {
+    console.error('检查AI次数失败:', error)
+    return true // 默认允许继续
+  }
+}
 
 // 输入状态
 const prompt = ref(props.initialPrompt || '')
@@ -368,6 +475,12 @@ const parseSuggestions = (text: string): string[] => {
 // 开始生成 - 调用后端API
 const startGenerate = async () => {
   if (!prompt.value.trim()) return
+  
+  // 检查AI次数
+  const canGenerate = await checkAiUsage()
+  if (!canGenerate) {
+    return // 次数不足，已弹出购买弹窗
+  }
   
   isGenerating.value = true
   progress.value = 0
@@ -472,7 +585,7 @@ const extractTitle = (text: string): string => {
       }
     }
   }
-  const words = text.split(/[，。,\.\s]+/).filter(w => w.length > 2)
+  const words = text.split(/[，。,.\s]+/).filter(w => w.length > 2)
   return words[0]?.slice(0, 10) || '精彩设计'
 }
 
@@ -517,6 +630,27 @@ const useDesign = () => {
 const handleClose = () => {
   emit('close')
 }
+
+// 处理购买次数
+const handlePurchaseCredits = (pack: { count: number, price: number }) => {
+  aiUsage.value.extraCount += pack.count
+  aiUsage.value.remaining += pack.count
+  showCreditsDialog.value = false
+  // 实际项目中应该调用支付API
+  alert(`购买成功！获得 ${pack.count} 次AI设计次数`)
+}
+
+// 初始化时获取使用情况
+if (props.visible) {
+  fetchAiUsage()
+}
+
+// 监听visible变化
+watch(() => props.visible, (newVal) => {
+  if (newVal) {
+    fetchAiUsage()
+  }
+})
 
 // 监听初始提示词变化
 watch(() => props.initialPrompt, (newVal) => {
