@@ -82,7 +82,6 @@ public class VipServiceImpl implements VipService {
         order.setPackageId(dto.getPackageId());
         order.setPackageName(packageInfo.getName());
         order.setOriginalPrice(packageInfo.getOriginalPrice());
-        order.setCurrentPrice(packageInfo.getCurrentPrice());
         order.setPaidAmount(packageInfo.getCurrentPrice());
         order.setDiscountAmount(packageInfo.getOriginalPrice().subtract(packageInfo.getCurrentPrice()));
         order.setPaymentMethod(dto.getPaymentMethod());
