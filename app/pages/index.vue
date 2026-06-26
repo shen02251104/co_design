@@ -499,8 +499,19 @@
 <script setup lang="ts">
 import { ref, h, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import AIDesignDialog from '~/components/AIDesignDialog.vue'
+import TemplatePreview from '~/components/TemplatePreview.vue'
+import SizeSelector from '~/components/SizeSelector.vue'
+import VipPurchaseDialog from '~/components/VipPurchaseDialog.vue'
 
 const router = useRouter()
+
+// 弹窗状态
+const showAIDialog = ref(false)
+const showTemplatePreview = ref(false)
+const showSizeSelector = ref(false)
+const showVipDialog = ref(false)
+const selectedTemplate = ref<any>(null)
 
 // AI提示词
 const aiPrompt = ref('')
@@ -549,9 +560,13 @@ const quickTools = [
 
 // 处理AI设计
 const handleAIDesign = () => {
-  if (aiPrompt.value.trim()) {
-    router.push({ path: '/poster-design', query: { mode: 'ai', prompt: aiPrompt.value } })
-  }
+  showAIDialog.value = true
+}
+
+// AI设计完成回调
+const onAIDesignComplete = (result: any) => {
+  showAIDialog.value = false
+  router.push({ path: '/poster-design', query: { mode: 'ai', prompt: result.prompt } })
 }
 
 // 处理文件拖拽
@@ -614,9 +629,16 @@ const openWork = (work: { id: number }) => {
   router.push(`/poster-design?work=${work.id}`)
 }
 
-// 使用模板
-const useTemplate = (template: { id: number }) => {
-  router.push(`/poster-design?template=${template.id}`)
+// 使用模板 - 显示预览
+const useTemplate = (template: any) => {
+  selectedTemplate.value = template
+  showTemplatePreview.value = true
+}
+
+// 确认使用模板
+const onTemplateConfirm = (templateId: number) => {
+  showTemplatePreview.value = false
+  router.push(`/poster-design?template=${templateId}`)
 }
 
 // 导航到海报设计
