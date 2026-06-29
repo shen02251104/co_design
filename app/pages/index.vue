@@ -1,40 +1,36 @@
 <template>
   <div class="min-h-screen">
     <NuxtLayout>
-      <!-- AI智能设计入口 - 突出展示 -->
-      <div class="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl p-6 mb-6 relative overflow-hidden shadow-lg">
-        <div class="absolute inset-0 bg-grid-white/5"></div>
+      <!-- AI智能设计入口 - 简洁专业风格 -->
+      <div class="bg-white rounded-xl p-6 mb-6 shadow-sm border border-gray-100">
         <div class="flex items-center gap-6">
           <!-- 左侧AI对话入口 -->
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-3">
-              <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-medium backdrop-blur-sm">
+              <span class="bg-indigo-50 text-indigo-600 text-xs px-3 py-1 rounded-full font-medium">
                 AI智能设计
               </span>
-              <span class="bg-yellow-400/90 text-yellow-900 text-xs px-2 py-1 rounded-full font-medium">
-                NEW
-              </span>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-2">输入文字，AI自动生成设计</h2>
-            <p class="text-white/80 text-sm mb-4">描述您想要的设计，AI将为您自动创建专业作品</p>
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">输入文字，AI自动生成设计</h2>
+            <p class="text-gray-500 text-sm mb-4">描述您想要的设计，AI将为您自动创建专业作品</p>
             <div class="flex items-center gap-3">
               <div class="flex-1 max-w-xl">
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 flex items-center gap-3 border border-white/20">
-                  <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-gray-50 rounded-lg p-3 flex items-center gap-3 border border-gray-200">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                   <input 
                     v-model="aiPrompt"
                     type="text" 
                     placeholder="例如：帮我设计一张促销海报，主题是夏季清凉..."
-                    class="flex-1 bg-transparent text-white placeholder-white/50 outline-none text-sm"
+                    class="flex-1 bg-transparent text-gray-700 placeholder-gray-400 outline-none text-sm"
                   />
                   <button 
-                    class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-white/90 transition flex items-center gap-2 shadow-md"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition flex items-center gap-2"
                     @click="handleAIDesign"
                   >
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     生成
                   </button>
@@ -44,22 +40,22 @@
           </div>
           <!-- 右侧示例展示 -->
           <div class="flex gap-3">
-            <div class="w-20 h-28 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center overflow-hidden border border-white/20">
+            <div class="w-20 h-28 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-200">
               <div class="text-center p-2">
-                <div class="w-8 h-8 mx-auto mb-1 rounded-full bg-gradient-to-br from-orange-400 to-pink-400"></div>
-                <div class="text-white/60 text-xs">促销海报</div>
+                <div class="w-8 h-8 mx-auto mb-1 rounded-full bg-gray-200"></div>
+                <div class="text-gray-500 text-xs">促销海报</div>
               </div>
             </div>
-            <div class="w-20 h-28 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center overflow-hidden border border-white/20">
+            <div class="w-20 h-28 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-200">
               <div class="text-center p-2">
-                <div class="w-8 h-8 mx-auto mb-1 rounded-lg bg-gradient-to-br from-blue-400 to-purple-400"></div>
-                <div class="text-white/60 text-xs">商品主图</div>
+                <div class="w-8 h-8 mx-auto mb-1 rounded-lg bg-gray-200"></div>
+                <div class="text-gray-500 text-xs">商品主图</div>
               </div>
             </div>
-            <div class="w-20 h-28 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center overflow-hidden border border-white/20">
+            <div class="w-20 h-28 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden border border-gray-200">
               <div class="text-center p-2">
-                <div class="w-8 h-8 mx-auto mb-1 rounded bg-gradient-to-br from-green-400 to-teal-400"></div>
-                <div class="text-white/60 text-xs">详情页</div>
+                <div class="w-8 h-8 mx-auto mb-1 rounded bg-gray-200"></div>
+                <div class="text-gray-500 text-xs">详情页</div>
               </div>
             </div>
           </div>
@@ -72,13 +68,13 @@
         <button 
           v-for="scene in scenes" 
           :key="scene.id"
-          class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 shrink-0 flex items-center gap-2"
+          class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shrink-0 flex items-center gap-2"
           :class="activeScene === scene.id 
-            ? 'bg-gradient-to-r ' + scene.activeColor + ' text-white shadow-md' 
-            : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'"
+            ? 'bg-indigo-600 text-white' 
+            : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'"
           @click="activeScene = scene.id"
         >
-          <span class="w-4 h-4" :class="activeScene === scene.id ? 'text-white' : scene.iconColor">
+          <span class="w-4 h-4" :class="activeScene === scene.id ? 'text-white' : 'text-gray-400'">
             <component :is="scene.icon" />
           </span>
           {{ scene.name }}
@@ -91,16 +87,16 @@
         <div class="col-span-4">
           <!-- 上传区域 -->
           <div 
-            class="bg-white rounded-2xl shadow-md border-2 border-dashed transition-all duration-200 overflow-hidden relative group"
-            :class="isDragging ? 'border-purple-400 bg-purple-50' : 'border-gray-200 hover:border-purple-300 hover:shadow-lg'"
+            class="bg-white rounded-xl shadow-sm border-2 border-dashed transition-all duration-200 overflow-hidden relative group"
+            :class="isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'"
             @dragover.prevent="isDragging = true"
             @dragleave.prevent="isDragging = false"
             @drop.prevent="handleDrop"
           >
             <!-- 上传提示 -->
             <div class="p-6 flex flex-col items-center justify-center min-h-[200px]">
-              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform shadow-sm">
-                <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-16 h-16 rounded-xl bg-indigo-50 flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 01 9 9h-1" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
@@ -115,7 +111,7 @@
                 @change="handleFileSelect"
               />
               <button 
-                class="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-2.5 rounded-xl font-medium hover:from-purple-600 hover:to-blue-600 transition shadow-md"
+                class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition"
                 @click="triggerFileInput"
               >
                 选择图片
@@ -133,7 +129,7 @@
                   <p class="text-xs text-gray-400">{{ uploadedFile.size }}</p>
                 </div>
                 <button 
-                  class="bg-purple-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-purple-600 transition"
+                  class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
                   @click="startDesign"
                 >
                   开始设计
@@ -187,31 +183,31 @@
           <!-- 模板分类标签 -->
           <div class="flex items-center gap-2 mb-4 flex-wrap">
             <span 
-              class="px-3 py-1.5 text-white rounded-lg text-sm font-medium shadow-sm cursor-pointer transition-colors"
-              :class="templateFilter === 'all' ? 'bg-gradient-to-r from-purple-500 to-blue-500' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-colors"
+              :class="templateFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'"
               @click="templateFilter = 'all'"
             >全部模板</span>
             <span 
-              class="px-3 py-1.5 rounded-lg text-sm cursor-pointer shadow-sm border border-gray-100 transition-colors"
-              :class="templateFilter === 'vip' ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
+              class="px-3 py-1.5 rounded-lg text-sm cursor-pointer border transition-colors"
+              :class="templateFilter === 'vip' ? 'bg-amber-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50 border-gray-200'"
               @click="templateFilter = 'vip'"
             >
-              <svg class="w-3.5 h-3.5 inline mr-1 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3.5 h-3.5 inline mr-1" :class="templateFilter === 'vip' ? 'text-white' : 'text-amber-500'" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/>
               </svg>
               VIP专属
             </span>
             <span 
-              class="px-3 py-1.5 rounded-lg text-sm cursor-pointer shadow-sm border border-gray-100 transition-colors"
-              :class="templateFilter === 'free' ? 'bg-gradient-to-r from-green-400 to-teal-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
+              class="px-3 py-1.5 rounded-lg text-sm cursor-pointer border transition-colors"
+              :class="templateFilter === 'free' ? 'bg-green-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50 border-gray-200'"
               @click="templateFilter = 'free'"
             >免费模板</span>
-            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer shadow-sm border border-gray-100">电商海报</span>
-            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer shadow-sm border border-gray-100">商品主图</span>
-            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer shadow-sm border border-gray-100">详情页</span>
-            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer shadow-sm border border-gray-100">促销活动</span>
-            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer shadow-sm border border-gray-100">社交分享</span>
-            <NuxtLink to="/templates" class="px-3 py-1.5 text-purple-600 text-sm hover:text-purple-700 flex items-center gap-1 font-medium">
+            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer border border-gray-200">电商海报</span>
+            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer border border-gray-200">商品主图</span>
+            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer border border-gray-200">详情页</span>
+            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer border border-gray-200">促销活动</span>
+            <span class="px-3 py-1.5 bg-white text-gray-600 rounded-lg text-sm hover:bg-gray-50 cursor-pointer border border-gray-200">社交分享</span>
+            <NuxtLink to="/templates" class="px-3 py-1.5 text-indigo-600 text-sm hover:text-indigo-700 flex items-center gap-1 font-medium">
               更多模板
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -236,7 +232,7 @@
                   </div>
                 </div>
                 <!-- VIP标识 -->
-                <div v-if="template.isVip" class="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 shadow-lg">
+                <div v-if="template.isVip" class="absolute top-2 right-2 bg-amber-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
                   <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/>
                   </svg>
@@ -244,7 +240,7 @@
                 </div>
                 <!-- 悬浮操作 -->
                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <button class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition shadow-md">
+                  <button class="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition">
                     立即使用
                   </button>
                 </div>
@@ -283,51 +279,51 @@
       
       <!-- 功能推荐横幅 -->
       <div class="grid grid-cols-3 gap-4 mb-6">
-        <div class="bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl p-5 text-white relative overflow-hidden shadow-lg group hover:shadow-xl transition-shadow cursor-pointer" @click="navigateToPoster('product-suite')">
-          <div class="absolute top-3 left-3 bg-white/20 px-2 py-1 rounded text-xs font-medium backdrop-blur-sm">限时免费</div>
+        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm group hover:shadow-md transition-shadow cursor-pointer" @click="navigateToPoster('product-suite')">
+          <div class="absolute top-3 left-3 bg-green-100 text-green-600 px-2 py-1 rounded text-xs font-medium">限时免费</div>
           <div class="flex items-end justify-between">
             <div>
-              <h3 class="text-lg font-bold">商品套图PRO</h3>
-              <p class="text-white/80 text-sm mt-1">一键生成详情页套图</p>
-              <div class="flex items-center gap-1 mt-3 text-white/60 text-xs">
+              <h3 class="text-lg font-semibold text-gray-900">商品套图PRO</h3>
+              <p class="text-gray-500 text-sm mt-1">一键生成详情页套图</p>
+              <div class="flex items-center gap-1 mt-3 text-gray-400 text-xs">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                 </svg>
                 <span>3.2万人已使用</span>
               </div>
             </div>
-            <svg class="w-8 h-8 text-white/40 group-hover:text-white/60 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 text-gray-300 group-hover:text-indigo-500 transition-colors" fill="currentColor" viewBox="0 0 24 24">
               <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
             </svg>
           </div>
         </div>
         
-        <div class="bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl p-5 text-white relative overflow-hidden shadow-lg group hover:shadow-xl transition-shadow cursor-pointer" @click="navigateToPoster('video-gen')">
-          <div class="absolute top-3 left-3 bg-white/20 px-2 py-1 rounded text-xs font-medium backdrop-blur-sm">爆款工具</div>
-          <div class="flex items-end justify-between">
+        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm group hover:shadow-md transition-shadow cursor-pointer" @click="navigateToPoster('video-gen')">
+          <div class="bg-indigo-100 text-indigo-600 px-2 py-1 rounded text-xs font-medium inline-block">爆款工具</div>
+          <div class="flex items-end justify-between mt-3">
             <div>
-              <h3 class="text-lg font-bold">爆款视频生成</h3>
-              <p class="text-white/80 text-sm mt-1">AI自动生成带货视频</p>
-              <div class="flex items-center gap-1 mt-3 text-white/60 text-xs">
+              <h3 class="text-lg font-semibold text-gray-900">爆款视频生成</h3>
+              <p class="text-gray-500 text-sm mt-1">AI自动生成带货视频</p>
+              <div class="flex items-center gap-1 mt-3 text-gray-400 text-xs">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
                 </svg>
                 <span>视频制作神器</span>
               </div>
             </div>
-            <svg class="w-8 h-8 text-white/40 group-hover:text-white/60 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 text-gray-300 group-hover:text-indigo-500 transition-colors" fill="currentColor" viewBox="0 0 24 24">
               <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
             </svg>
           </div>
         </div>
         
-        <div class="bg-gradient-to-br from-purple-500 to-violet-500 rounded-2xl p-5 text-white relative overflow-hidden shadow-lg group hover:shadow-xl transition-shadow cursor-pointer" @click="navigateToPoster('text-design')">
-          <div class="absolute top-3 left-3 bg-yellow-400/90 px-2 py-1 rounded text-xs font-medium text-yellow-900">新功能</div>
-          <div class="flex items-end justify-between">
+        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm group hover:shadow-md transition-shadow cursor-pointer" @click="navigateToPoster('text-design')">
+          <div class="bg-amber-100 text-amber-600 px-2 py-1 rounded text-xs font-medium inline-block">新功能</div>
+          <div class="flex items-end justify-between mt-3">
             <div>
-              <h3 class="text-lg font-bold">创意文字设计</h3>
-              <p class="text-white/80 text-sm mt-1">3D立体、霓虹灯特效</p>
-              <div class="flex items-center gap-1 mt-3 text-white/60 text-xs">
+              <h3 class="text-lg font-semibold text-gray-900">创意文字设计</h3>
+              <p class="text-gray-500 text-sm mt-1">3D立体、霓虹灯特效</p>
+              <div class="flex items-center gap-1 mt-3 text-gray-400 text-xs">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/>
                 </svg>
@@ -342,52 +338,45 @@
       </div>
       
       <!-- 会员权益展示 -->
-      <div class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-6 mb-6 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-3xl"></div>
-        <div class="flex items-center justify-between relative">
+      <div class="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200">
+        <div class="flex items-center justify-between">
           <div class="flex items-center gap-6">
             <div>
-              <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                <svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+              <h3 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <svg class="w-6 h-6 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/>
                 </svg>
                 开通VIP会员
               </h3>
-              <p class="text-gray-400 text-sm mt-1">解锁全部功能，商业使用无风险</p>
+              <p class="text-gray-500 text-sm mt-1">解锁全部功能，商业使用无风险</p>
             </div>
             <div class="flex items-center gap-4">
               <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                 </svg>
-                <span class="text-white/80 text-sm">正版商用授权</span>
+                <span class="text-gray-600 text-sm">正版商用授权</span>
               </div>
               <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                 </svg>
-                <span class="text-white/80 text-sm">高清无水印下载</span>
+                <span class="text-gray-600 text-sm">高清无水印下载</span>
               </div>
               <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                 </svg>
-                <span class="text-white/80 text-sm">海量模板素材</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                </svg>
-                <span class="text-white/80 text-sm">AI工具无限使用</span>
+                <span class="text-gray-600 text-sm">海量模板素材</span>
               </div>
             </div>
           </div>
           <div class="flex items-center gap-3">
             <div class="text-right">
-              <p class="text-yellow-400 text-2xl font-bold">¥389<span class="text-sm text-gray-400">/终身</span></p>
-              <p class="text-gray-500 text-xs">原价¥399，立省10元</p>
+              <p class="text-amber-500 text-2xl font-bold">¥389<span class="text-sm text-gray-400">/终身</span></p>
+              <p class="text-gray-400 text-xs">原价¥399，立省10元</p>
             </div>
-            <button class="bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 px-6 py-3 rounded-xl font-bold hover:from-yellow-500 hover:to-orange-500 transition shadow-lg">
+            <button class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition">
               立即开通
             </button>
           </div>
@@ -398,9 +387,9 @@
       <div class="mb-6">
         <h3 class="text-lg font-bold text-gray-900 mb-4">客户案例</h3>
         <div class="grid grid-cols-4 gap-4">
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+          <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-pink-400"></div>
+              <div class="w-10 h-10 rounded-full bg-gray-200"></div>
               <div>
                 <p class="font-medium text-gray-900 text-sm">某电商品牌</p>
                 <p class="text-xs text-gray-400">月销10万+</p>
@@ -408,15 +397,15 @@
             </div>
             <p class="text-sm text-gray-600 mb-2">"使用易可图后，详情页制作效率提升了80%，转化率也明显提高"</p>
             <div class="flex items-center gap-1 text-xs text-gray-400">
-              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
               </svg>
               <span>5.0</span>
             </div>
           </div>
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+          <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-400"></div>
+              <div class="w-10 h-10 rounded-full bg-gray-200"></div>
               <div>
                 <p class="font-medium text-gray-900 text-sm">跨境电商卖家</p>
                 <p class="text-xs text-gray-400">亚马逊店铺</p>
@@ -424,15 +413,15 @@
             </div>
             <p class="text-sm text-gray-600 mb-2">"A+详情页功能太强大了，一键生成符合亚马逊规范的详情页"</p>
             <div class="flex items-center gap-1 text-xs text-gray-400">
-              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
               </svg>
               <span>4.9</span>
             </div>
           </div>
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+          <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-teal-400"></div>
+              <div class="w-10 h-10 rounded-full bg-gray-200"></div>
               <div>
                 <p class="font-medium text-gray-900 text-sm">独立站运营</p>
                 <p class="text-xs text-gray-400">DTC品牌</p>
@@ -440,15 +429,15 @@
             </div>
             <p class="text-sm text-gray-600 mb-2">"商品套图功能帮我节省了大量设计成本，每月省下5000元"</p>
             <div class="flex items-center gap-1 text-xs text-gray-400">
-              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
               </svg>
               <span>4.8</span>
             </div>
           </div>
-          <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+          <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-3 mb-3">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-indigo-400"></div>
+              <div class="w-10 h-10 rounded-full bg-gray-200"></div>
               <div>
                 <p class="font-medium text-gray-900 text-sm">社媒运营团队</p>
                 <p class="text-xs text-gray-400">小红书/抖音</p>
@@ -456,7 +445,7 @@
             </div>
             <p class="text-sm text-gray-600 mb-2">"批量生成社交分享图，再也不用加班做图了"</p>
             <div class="flex items-center gap-1 text-xs text-gray-400">
-              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
               </svg>
               <span>5.0</span>
@@ -466,7 +455,7 @@
       </div>
       
       <!-- 底部Footer -->
-      <footer class="bg-gray-100 rounded-2xl p-6 mt-6">
+      <footer class="bg-gray-50 rounded-xl p-6 mt-6 border border-gray-200">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
