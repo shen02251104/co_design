@@ -503,6 +503,13 @@
         </div>
       </footer>
     </NuxtLayout>
+    
+    <!-- 创建空白设计弹窗 -->
+    <CreateBlankDesignDialog 
+      :visible="showBlankDesignDialog"
+      @close="showBlankDesignDialog = false"
+      @create="handleBlankDesignCreate"
+    />
   </div>
 </template>
 
@@ -513,6 +520,7 @@ import AIDesignDialog from '~/components/AIDesignDialog.vue'
 import TemplatePreview from '~/components/TemplatePreview.vue'
 import SizeSelector from '~/components/SizeSelector.vue'
 import VipPurchaseDialog from '~/components/VipPurchaseDialog.vue'
+import CreateBlankDesignDialog from '~/components/CreateBlankDesignDialog.vue'
 
 const router = useRouter()
 
@@ -524,6 +532,7 @@ const showAIDialog = ref(false)
 const showTemplatePreview = ref(false)
 const showSizeSelector = ref(false)
 const showVipDialog = ref(false)
+const showBlankDesignDialog = ref(false)
 const selectedTemplate = ref<any>(null)
 
 // AI提示词
@@ -650,9 +659,16 @@ const startDesign = () => {
   }
 }
 
-// 创建空白设计
+// 创建空白设计 - 显示尺寸选择弹窗
 const createBlankDesign = () => {
-  router.push('/poster-design?mode=create')
+  showBlankDesignDialog.value = true
+}
+
+// 确认创建空白设计 - 跳转到编辑器
+const handleBlankDesignCreate = (config: { width: number; height: number; name: string }) => {
+  showBlankDesignDialog.value = false
+  // 跳转到设计编辑器，携带尺寸和名称参数
+  router.push(`/poster-design?mode=create&width=${config.width}&height=${config.height}&name=${encodeURIComponent(config.name)}`)
 }
 
 // 打开作品

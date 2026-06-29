@@ -552,6 +552,13 @@ const showVipDialog = ref(false)
 const exportFormat = ref('png')
 const exportQuality = ref('high')
 
+// 设计名称（从URL参数或默认）
+const designName = ref('我的设计')
+
+// 自定义画布尺寸（从URL参数或默认）
+const customWidth = ref<number | null>(null)
+const customHeight = ref<number | null>(null)
+
 // VIP状态
 const isVip = ref(false) // TODO: 从后端获取用户VIP状态
 
@@ -588,14 +595,23 @@ const canvasSizes = [
   { id: 'poster', name: '海报 (800x1200)', width: 800, height: 1200 },
   { id: 'detail', name: '详情页 (750x2000)', width: 750, height: 2000 },
   { id: 'square', name: '方形 (800x800)', width: 800, height: 800 },
+  { id: 'custom', name: '自定义尺寸', width: 0, height: 0 },
 ]
 
 const canvasWidth = computed(() => {
+  // 如果有自定义尺寸，优先使用
+  if (customWidth.value) {
+    return customWidth.value
+  }
   const size = canvasSizes.find(s => s.id === activeSize.value)
   return size?.width || 750
 })
 
 const canvasHeight = computed(() => {
+  // 如果有自定义尺寸，优先使用
+  if (customHeight.value) {
+    return customHeight.value
+  }
   const size = canvasSizes.find(s => s.id === activeSize.value)
   return size?.height || 400
 })
@@ -816,6 +832,29 @@ onMounted(() => {
   const menuParam = route.query.menu as string
   if (menuParam && posterMenuItems.find(item => item.id === menuParam)) {
     activeMenuId.value = menuParam
+  }
+  
+  // 从 URL 参数获取空白设计配置
+  const mode = route.query.mode as string
+  if (mode === 'create') {
+    // 获取自定义尺寸
+    const widthParam = route.query.width as string
+    const heightParam = route.query.height as string
+    const nameParam = route.query.name as string
+    
+    if (widthParam && heightParam) {
+      customWidth.value = parseInt(widthParam) || null
+      customHeight.value = parseInt(heightParam) || null
+    }
+    
+    if (nameParam) {
+      designName.value = nameParam
+    }
+    
+    // 清除activeSize以使用自定义尺寸
+    if (customWidth.value && customHeight.value) {
+      activeSize.value = 'custom'
+    }
   }
   
   // 初始化历史记录
