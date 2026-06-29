@@ -94,6 +94,9 @@
     
     <!-- 反馈按钮 -->
     <FeedbackButton />
+    
+    <!-- 客服组件 -->
+    <CustomerService />
   </div>
 </template>
 

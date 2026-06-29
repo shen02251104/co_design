@@ -1,2 +1,27 @@
-User-Agent: *
-Disallow:
+User-agent: *
+Allow: /
+
+# 禁止访问的路径
+Disallow: /api/
+Disallow: /_nuxt/
+Disallow: /user-center
+Disallow: /login
+Disallow: /register
+
+# 允许访问的页面
+Allow: /
+Allow: /templates
+Allow: /ai-tools
+Allow: /image-tools
+Allow: /cross-border
+Allow: /membership-pricing
+Allow: /poster-design
+Allow: /help
+Allow: /user-agreement
+Allow: /privacy-policy
+
+# 站点地图
+Sitemap: https://yiketu.com/sitemap.xml
+
+# 抓取延迟
+Crawl-delay: 1
