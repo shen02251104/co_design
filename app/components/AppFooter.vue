@@ -8,7 +8,7 @@
           <h4 class="font-bold mb-4 text-gray-300">关于我们</h4>
           <ul class="space-y-2 text-sm text-gray-400">
             <li>
-              <NuxtLink to="/about" class="hover:text-white transition-colors">
+              <NuxtLink to="/about-us" class="hover:text-white transition-colors">
                 公司介绍
               </NuxtLink>
             </li>
@@ -18,7 +18,7 @@
               </NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/contact" class="hover:text-white transition-colors">
+              <NuxtLink to="/contact-us" class="hover:text-white transition-colors">
                 联系我们
               </NuxtLink>
             </li>

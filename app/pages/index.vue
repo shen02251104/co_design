@@ -465,10 +465,10 @@
               <span class="text-gray-600 text-sm font-medium">易可图</span>
             </div>
             <div class="flex items-center gap-4 text-sm text-gray-500">
-              <NuxtLink to="/about" class="hover:text-gray-700 transition">关于我们</NuxtLink>
+              <NuxtLink to="/about-us" class="hover:text-gray-700 transition">关于我们</NuxtLink>
               <NuxtLink to="/membership-pricing" class="hover:text-gray-700 transition">价格方案</NuxtLink>
               <NuxtLink to="/help-center" class="hover:text-gray-700 transition">帮助中心</NuxtLink>
-              <NuxtLink to="/contact" class="hover:text-gray-700 transition">联系我们</NuxtLink>
+              <NuxtLink to="/contact-us" class="hover:text-gray-700 transition">联系我们</NuxtLink>
               <NuxtLink to="/user-center" class="hover:text-gray-700 transition">用户中心</NuxtLink>
             </div>
           </div>
