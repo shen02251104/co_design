@@ -510,6 +510,21 @@
       @close="showBlankDesignDialog = false"
       @create="handleBlankDesignCreate"
     />
+    
+    <!-- 模板预览弹窗 -->
+    <TemplatePreview 
+      :visible="showTemplatePreview"
+      :template="selectedTemplate"
+      @close="showTemplatePreview = false"
+      @use="onTemplateConfirm"
+      @openVip="showVipDialog = true"
+    />
+    
+    <!-- VIP购买弹窗 -->
+    <VipPurchaseDialog 
+      :visible="showVipDialog"
+      @close="showVipDialog = false"
+    />
   </div>
 </template>
 
@@ -561,28 +576,86 @@ const recentWorks = [
 ]
 
 // 模板列表
-const templates = [
-  { id: 1, name: '电商促销海报', size: '800×1200', useCount: 3256, previewText: '促销', bgColor: 'bg-gradient-to-br from-orange-400 to-pink-400', isVip: false },
-  { id: 2, name: '商品主图模板', size: '800×800', useCount: 1892, previewText: '主图', bgColor: 'bg-gradient-to-br from-blue-400 to-purple-400', isVip: true },
-  { id: 3, name: '详情页模板', size: '750×2000', useCount: 2156, previewText: '详情', bgColor: 'bg-gradient-to-br from-green-400 to-teal-400', isVip: true },
-  { id: 4, name: '新品发布海报', size: '1080×1920', useCount: 1256, previewText: '新品', bgColor: 'bg-gradient-to-br from-purple-400 to-indigo-400', isVip: false },
-  { id: 5, name: '社交分享图', size: '1080×1080', useCount: 1562, previewText: '分享', bgColor: 'bg-gradient-to-br from-cyan-400 to-blue-400', isVip: false },
-  { id: 6, name: '节日促销海报', size: '800×1200', useCount: 2891, previewText: '节日', bgColor: 'bg-gradient-to-br from-red-400 to-orange-400', isVip: true },
-  { id: 7, name: '直播预告海报', size: '1080×1920', useCount: 1125, previewText: '直播', bgColor: 'bg-gradient-to-br from-yellow-400 to-orange-400', isVip: false },
-  { id: 8, name: '品牌宣传海报', size: '1200×628', useCount: 892, previewText: '品牌', bgColor: 'bg-gradient-to-br from-gray-700 to-gray-900', isVip: true },
-]
+// 模板列表（从API获取）
+interface TemplateItem {
+  id: string | number
+  title: string
+  cover: string
+  width: number
+  height: number
+  category: string
+  isVip: boolean
+  downloads: number
+  tags: string[]
+  name?: string
+  size?: string
+  useCount?: number
+  previewText?: string
+  bgColor?: string
+}
 
-// 模板筛选状态
+const templates = ref<TemplateItem[]>([])
+const templateCategories = ref<{ id: string; name: string; count: number }[]>([])
+const selectedCategory = ref<string>('all')
 const templateFilter = ref<'all' | 'vip' | 'free'>('all')
+const isLoadingTemplates = ref(false)
+
+// 获取模板列表
+const fetchTemplates = async () => {
+  isLoadingTemplates.value = true
+  try {
+    const response = await $fetch('/api/templates/list', {
+      query: {
+        category: selectedCategory.value,
+        page: 1,
+        pageSize: 20
+      }
+    }) as { success: boolean; data: { templates: TemplateItem[]; categories: { id: string; name: string; count: number }[] } }
+    
+    if (response.success) {
+      // 转换数据格式以适配现有模板展示
+      templates.value = response.data.templates.map(t => ({
+        ...t,
+        name: t.title,
+        size: `${t.width}×${t.height}`,
+        useCount: t.downloads,
+        previewText: t.tags[0] || '模板',
+        bgColor: 'bg-gradient-to-br from-gray-100 to-gray-200'
+      }))
+      templateCategories.value = response.data.categories
+    }
+  } catch (error) {
+    console.error('获取模板列表失败:', error)
+    // 使用兜底数据
+    templates.value = [
+      { id: '1', title: '电商促销海报', cover: '', width: 800, height: 1200, category: '电商海报', isVip: false, downloads: 3256, tags: ['促销'], name: '电商促销海报', size: '800×1200', useCount: 3256, previewText: '促销', bgColor: 'bg-gradient-to-br from-gray-100 to-gray-200' },
+      { id: '2', title: '商品主图模板', cover: '', width: 800, height: 800, category: '电商海报', isVip: true, downloads: 1892, tags: ['主图'], name: '商品主图模板', size: '800×800', useCount: 1892, previewText: '主图', bgColor: 'bg-gradient-to-br from-gray-100 to-gray-200' },
+      { id: '3', title: '详情页模板', cover: '', width: 750, height: 2000, category: '电商海报', isVip: true, downloads: 2156, tags: ['详情'], name: '详情页模板', size: '750×2000', useCount: 2156, previewText: '详情', bgColor: 'bg-gradient-to-br from-gray-100 to-gray-200' },
+      { id: '4', title: '新品发布海报', cover: '', width: 1080, height: 1920, category: '节日活动', isVip: false, downloads: 1256, tags: ['新品'], name: '新品发布海报', size: '1080×1920', useCount: 1256, previewText: '新品', bgColor: 'bg-gradient-to-br from-gray-100 to-gray-200' },
+      { id: '5', title: '社交分享图', cover: '', width: 1080, height: 1080, category: '社交媒体', isVip: false, downloads: 1562, tags: ['分享'], name: '社交分享图', size: '1080×1080', useCount: 1562, previewText: '分享', bgColor: 'bg-gradient-to-br from-gray-100 to-gray-200' },
+      { id: '6', title: '节日促销海报', cover: '', width: 800, height: 1200, category: '节日活动', isVip: true, downloads: 2891, tags: ['节日'], name: '节日促销海报', size: '800×1200', useCount: 2891, previewText: '节日', bgColor: 'bg-gradient-to-br from-gray-100 to-gray-200' },
+      { id: '7', title: '直播预告海报', cover: '', width: 1080, height: 1920, category: '社交媒体', isVip: false, downloads: 1125, tags: ['直播'], name: '直播预告海报', size: '1080×1920', useCount: 1125, previewText: '直播', bgColor: 'bg-gradient-to-br from-gray-100 to-gray-200' },
+      { id: '8', title: '品牌宣传海报', cover: '', width: 1200, height: 628, category: '企业宣传', isVip: true, downloads: 892, tags: ['品牌'], name: '品牌宣传海报', size: '1200×628', useCount: 892, previewText: '品牌', bgColor: 'bg-gradient-to-br from-gray-100 to-gray-200' },
+    ]
+  } finally {
+    isLoadingTemplates.value = false
+  }
+}
 
 // 筛选后的模板列表
 const filteredTemplates = computed(() => {
+  let result = templates.value
   if (templateFilter.value === 'vip') {
-    return templates.filter(t => t.isVip)
+    result = result.filter(t => t.isVip)
   } else if (templateFilter.value === 'free') {
-    return templates.filter(t => !t.isVip)
+    result = result.filter(t => !t.isVip)
   }
-  return templates
+  return result
+})
+
+// 初始化时获取模板
+onMounted(() => {
+  fetchTemplates()
 })
 
 // 快捷工具列表
@@ -689,9 +762,13 @@ const useTemplate = (template: any) => {
 }
 
 // 确认使用模板
-const onTemplateConfirm = (templateId: number) => {
+const onTemplateConfirm = (template: any, size: string) => {
   showTemplatePreview.value = false
-  router.push(`/poster-design?template=${templateId}`)
+  // 跳转到设计编辑器，携带模板ID和尺寸参数
+  const sizeParts = size.split('×')
+  const width = sizeParts[0] || '800'
+  const height = sizeParts[1] || '1200'
+  router.push(`/poster-design?template=${template.id}&width=${width}&height=${height}`)
 }
 
 // 导航到海报设计

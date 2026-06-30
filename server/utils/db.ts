@@ -61,3 +61,39 @@ export async function getTemplateById(id: string | number) {
     return null
   }
 }
+
+// 获取模板列表（支持分类筛选）
+export async function getTemplatesByCategory(category: string = 'all', page: number = 1, pageSize: number = 20) {
+  try {
+    const offset = (page - 1) * pageSize
+    if (category === 'all') {
+      const results = await query(
+        'SELECT id, title, cover_image, width, height, category, is_vip, downloads, tags FROM design_templates LIMIT ? OFFSET ?',
+        [pageSize, offset]
+      )
+      return results
+    } else {
+      const results = await query(
+        'SELECT id, title, cover_image, width, height, category, is_vip, downloads, tags FROM design_templates WHERE category = ? LIMIT ? OFFSET ?',
+        [category, pageSize, offset]
+      )
+      return results
+    }
+  } catch (error) {
+    console.error('获取模板列表失败:', error)
+    return []
+  }
+}
+
+// 获取模板分类列表
+export async function getTemplateCategories() {
+  try {
+    const results = await query(
+      'SELECT category, COUNT(*) as count FROM design_templates GROUP BY category ORDER BY count DESC'
+    )
+    return results
+  } catch (error) {
+    console.error('获取模板分类失败:', error)
+    return []
+  }
+}

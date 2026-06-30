@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useAuth } from '~/composables/useAuth'
 
+const { user } = useAuth()
 const showModal = ref(false)
 const feedbackType = ref('bug')
 const feedbackContent = ref('')
 const contactInfo = ref('')
 const submitting = ref(false)
 const submitted = ref(false)
+const errorMessage = ref('')
 
 const feedbackTypes = [
   { value: 'bug', label: '问题反馈', icon: '🐛' },
@@ -17,27 +20,40 @@ const feedbackTypes = [
 
 async function submitFeedback() {
   if (!feedbackContent.value.trim()) {
-    alert('请填写反馈内容')
+    errorMessage.value = '请填写反馈内容'
     return
   }
   
   submitting.value = true
+  errorMessage.value = ''
   
   try {
-    // 模拟提交（实际应调用API）
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // 调用真实API提交反馈
+    const response = await $fetch('/api/feedback/submit', {
+      method: 'POST',
+      body: {
+        type: feedbackType.value,
+        content: feedbackContent.value,
+        contact: contactInfo.value,
+        userId: user.value?.id || null
+      }
+    })
     
-    submitted.value = true
-    feedbackContent.value = ''
-    contactInfo.value = ''
-    
-    // 3秒后关闭弹窗
-    setTimeout(() => {
-      showModal.value = false
-      submitted.value = false
-    }, 3000)
-  } catch (error) {
-    alert('提交失败，请稍后重试')
+    if ((response as any).success) {
+      submitted.value = true
+      feedbackContent.value = ''
+      contactInfo.value = ''
+      
+      // 3秒后关闭弹窗
+      setTimeout(() => {
+        showModal.value = false
+        submitted.value = false
+      }, 3000)
+    } else {
+      errorMessage.value = (response as any).error || '提交失败，请稍后重试'
+    }
+  } catch (error: any) {
+    errorMessage.value = error.message || '提交失败，请稍后重试'
   } finally {
     submitting.value = false
   }
@@ -125,6 +141,11 @@ async function submitFeedback() {
                   class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   placeholder="邮箱或手机号，方便我们回复您"
                 />
+              </div>
+              
+              <!-- 错误提示 -->
+              <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                {{ errorMessage }}
               </div>
               
               <!-- 提交按钮 -->
